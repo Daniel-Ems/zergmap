@@ -37,7 +37,7 @@ main(int argc, char *argv[])
     }
 
     int fCheck;
-    struct FileHeader *fh = malloc(sizeof(fh));
+    struct FileHeader *fh = malloc(sizeof(*fh));
 
     fCheck = fread(fh, sizeof(*fh), 1, decodeFile);
     if (fCheck != 1)
@@ -70,12 +70,12 @@ main(int argc, char *argv[])
     bool ipv4 = false; //if false means it is ipv6;
     size_t lengthCheck;
 
-    struct PcapHeader *ph = malloc(sizeof(ph));
-    struct EthernetFrame *eh = malloc(sizeof(eh));
-    struct Ipv4Header *ip = malloc(sizeof(ip));
-    struct Ipv6Header *ip6 = malloc(sizeof(ip6));
-    struct UdpHeader *udp = malloc(sizeof(udp));
-    struct ZergHeader *zh = malloc(sizeof(zh));
+    struct PcapHeader *ph = malloc(sizeof(*ph));
+    struct EthernetFrame *eh = malloc(sizeof(*eh));
+    struct Ipv4Header *ip = malloc(sizeof(*ip));
+    struct Ipv6Header *ip6 = malloc(sizeof(*ip6));
+    struct UdpHeader *udp = malloc(sizeof(*udp));
+    struct ZergHeader *zh = malloc(sizeof(*zh));
     puts("");
     do
     {
@@ -174,8 +174,8 @@ main(int argc, char *argv[])
         ip->version = ip->version >> 4;
 
         print_zerg_header(zh);
-
-        zerged = struct_init(total, decodeFile);
+      
+        zerged = struct_init(total, decodeFile, type);
 
         if (zerged == NULL)
         {
@@ -186,7 +186,7 @@ main(int argc, char *argv[])
 
         switch (zerg_header)
         {
-        case (0):
+        case (0): 
             messFunction(zerged);
             break;
         case (1):
