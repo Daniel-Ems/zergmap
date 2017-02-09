@@ -148,7 +148,7 @@ struct __attribute__ ((packed)) EncodeStatusPacket
 //Used to read message packet payloads
 struct MessagePacket
 {
-    char message[1];
+    char *message;
 };
 
 //Used to read/write command packet payloads
@@ -186,13 +186,13 @@ struct EncodeGps
 //Used to print and format payloads in decode.c
 union PayloadStructs
 {
-    struct StatusPacket *stat;
-    struct MessagePacket *mess;
-    struct CommandPacket *comm;
-    struct GpsPacket *gps;
+    struct StatusPacket stat;
+    struct MessagePacket mess;
+    struct CommandPacket comm;
+    struct GpsPacket gps;
 };
 
-union PayloadStructs *struct_init(int total, FILE * decode_file);
+union PayloadStructs *struct_init(int total, FILE * decode_file, int type);
 double doub_converter(uint64_t * number);
 uint64_t doub_flip(uint32_t * lat_long, uint32_t * long_lat);
 void print_zerg_header(struct ZergHeader *zerg);
