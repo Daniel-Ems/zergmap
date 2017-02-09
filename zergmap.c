@@ -37,9 +37,9 @@ main(int argc, char *argv[])
     }
 
     int fCheck;
-    struct FileHeader *fh;
+    struct FileHeader *fh = malloc(sizeof(fh));
 
-    fCheck = fread(&fh, sizeof(fh), 1, decodeFile);
+    fCheck = fread(fh, sizeof(*fh), 1, decodeFile);
     if (fCheck != 1)
     {
         fprintf(decodeFile,
@@ -69,34 +69,40 @@ main(int argc, char *argv[])
     int ipVer = 0;
     bool ipv4 = false; //if false means it is ipv6;
     size_t lengthCheck;
+
+    struct PcapHeader *ph = malloc(sizeof(ph));
+    struct EthernetFrame *eh = malloc(sizeof(eh));
+    struct Ipv4Header *ip = malloc(sizeof(ip));
+    struct Ipv6Header *ip6 = malloc(sizeof(ip6));
+    struct UdpHeader *udp = malloc(sizeof(udp));
+    struct ZergHeader *zh = malloc(sizeof(zh));
     puts("");
     do
     {
 
-        struct PcapHeader *ph = NULL;
+       
 
-        fCheck = fread(ph, sizeof(ph), 1, decodeFile);
+        fCheck = fread(ph, sizeof(*ph), 1, decodeFile);
         if (fCheck != 1)
         {
             break;
         }
 
 
-        struct EthernetFrame *eh = NULL;
+        
 
-        fCheck = fread(eh, sizeof(eh), 1, decodeFile);
+        fCheck = fread(eh, sizeof(*eh), 1, decodeFile);
         if (fCheck != 1)
         {
             break;
         }
 
-        struct Ipv4Header *ip = NULL;
-        struct Ipv6Header *ip6 = NULL;
+        
         ipVer = eh->type;
         if(ipVer == 8)
         {
 
-            fCheck = fread(ip, sizeof(ip), 1, decodeFile);
+            fCheck = fread(ip, sizeof(*ip), 1, decodeFile);
              if (fCheck != 1)
              {
                 break;
@@ -106,23 +112,23 @@ main(int argc, char *argv[])
         else
         {
             
-            fCheck = fread(ip6, sizeof(ip6), 1, decodeFile);
+            fCheck = fread(ip6, sizeof(*ip6), 1, decodeFile);
             if (fCheck !=1)
             {
                 break;
             }
         }
-        struct UdpHeader *udp = NULL;
+        
 
-        fCheck = fread(&udp, sizeof(udp), 1, decodeFile);
+        fCheck = fread(udp, sizeof(*udp), 1, decodeFile);
         if (fCheck != 1)
         {
             break;
         }
 
-        struct ZergHeader *zh = NULL;
+        
 
-        fCheck = fread(&zh, sizeof(zh), 1, decodeFile);
+        fCheck = fread(zh, sizeof(*zh), 1, decodeFile);
         if (fCheck != 1)
         {
             break;
@@ -199,5 +205,12 @@ main(int argc, char *argv[])
         puts("");
     } while (nextPos != lastPos);
 
+    free(zh);
+    free(udp);
+    free(ip6);
+    free(ip);
+    free(eh);
+    free(ph);
+    free(fh);
     fclose(decodeFile);
 }
