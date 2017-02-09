@@ -23,6 +23,9 @@ enum
 enum
 { etherIpUdp = 14 + 20 + 8 };
 
+enum
+{ etherIp6Udp = 14 + 40 + 8};
+
 //Used to read/write in the file header
 struct FileHeader
 {
@@ -67,6 +70,19 @@ struct __attribute__ ((packed)) Ipv4Header
     uint32_t d_ip;
 };
 
+struct __attribute__ ((packed)) Ipv6Header
+{
+	uint32_t version : 4;
+	uint32_t trafficClass : 8;
+	uint32_t flowLabel : 20;
+	uint32_t payLen : 16;
+	uint32_t next : 8;
+	uint32_t hop : 8;
+	uint64_t sourceOne;
+	uint64_t sourceTwo;
+	uint64_t destOne;
+	uint64_t destTwo;
+};
 //Used to write the ipv4 header for the encoder
 struct __attribute__ ((packed)) encodeIpv4
 {
