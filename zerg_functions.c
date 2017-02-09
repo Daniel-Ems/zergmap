@@ -37,15 +37,15 @@ converter(uint32_t * thing)
 }
 
 void
-print_zerg_header(struct ZergHeader zerg)
+print_zerg_header(struct ZergHeader *zerg)
 {
 
-    zerg.version = (zerg.version & 0x10) >> 4;
+    zerg->version = (zerg->version & 0x10) >> 4;
 
-    printf("Version : %d\n", zerg.version);
-    printf("Sequence: %d\n", ntohl(zerg.id));
-    printf("From    : %d\n", ntohs(zerg.source));
-    printf("To      : %d\n", ntohs(zerg.dest));
+    printf("Version : %d\n", zerg->version);
+    printf("Sequence: %d\n", ntohl(zerg->id));
+    printf("From    : %d\n", ntohs(zerg->source));
+    printf("To      : %d\n", ntohs(zerg->dest));
 }
 
 
