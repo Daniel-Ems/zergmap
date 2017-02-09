@@ -37,7 +37,7 @@ main(int argc, char *argv[])
     }
 
     int fCheck;
-    struct FileHeader fh;
+    struct FileHeader *fh;
 
     fCheck = fread(&fh, sizeof(fh), 1, decodeFile);
     if (fCheck != 1)
@@ -49,7 +49,7 @@ main(int argc, char *argv[])
 
     uint32_t magicNumber = 0xa1b2c3d4;
 
-    if (fh.fileType != magicNumber)
+    if (fh->fileType != magicNumber)
     {
         printf("Wrong Endianess or no pcap\n");
         return EX_USAGE;
@@ -58,7 +58,7 @@ main(int argc, char *argv[])
 
     uint32_t linkCheck = 0x1;
 
-    if (fh.linkLayer != linkCheck)
+    if (fh->linkLayer != linkCheck)
     {
         printf("Wrong link layer\n");
         return EX_USAGE;
@@ -73,30 +73,30 @@ main(int argc, char *argv[])
     do
     {
 
-        struct PcapHeader ph;
+        struct PcapHeader *ph = NULL;
 
-        fCheck = fread(&ph, sizeof(ph), 1, decodeFile);
+        fCheck = fread(ph, sizeof(ph), 1, decodeFile);
         if (fCheck != 1)
         {
             break;
         }
 
 
-        struct EthernetFrame eh;
+        struct EthernetFrame *eh = NULL;
 
-        fCheck = fread(&eh, sizeof(eh), 1, decodeFile);
+        fCheck = fread(eh, sizeof(eh), 1, decodeFile);
         if (fCheck != 1)
         {
             break;
         }
 
-        struct Ipv4Header ip;
-        struct Ipv6Header ip6;
-        ipVer = eh.type;
+        struct Ipv4Header *ip = NULL;
+        struct Ipv6Header *ip6 = NULL;
+        ipVer = eh->type;
         if(ipVer == 8)
         {
 
-            fCheck = fread(&ip, sizeof(ip), 1, decodeFile);
+            fCheck = fread(ip, sizeof(ip), 1, decodeFile);
              if (fCheck != 1)
              {
                 break;
@@ -106,13 +106,13 @@ main(int argc, char *argv[])
         else
         {
             
-            fCheck = fread(&ip6, 40, 1, decodeFile);
+            fCheck = fread(ip6, sizeof(ip6), 1, decodeFile);
             if (fCheck !=1)
             {
                 break;
             }
         }
-        struct UdpHeader udp;
+        struct UdpHeader *udp = NULL;
 
         fCheck = fread(&udp, sizeof(udp), 1, decodeFile);
         if (fCheck != 1)
@@ -120,7 +120,7 @@ main(int argc, char *argv[])
             break;
         }
 
-        struct ZergHeader zh;
+        struct ZergHeader *zh = NULL;
 
         fCheck = fread(&zh, sizeof(zh), 1, decodeFile);
         if (fCheck != 1)
@@ -128,7 +128,7 @@ main(int argc, char *argv[])
             break;
         }
 
-        int total = ntohl(zh.version) & 0xffffff;
+        int total = ntohl(zh->version) & 0xffffff;
 
         if (total < 12)
         {
@@ -146,7 +146,7 @@ main(int argc, char *argv[])
             lengthCheck = etherIp6Udp + total;
         }
 
-        if (ph.captureLength < lengthCheck)
+        if (ph->captureLength < lengthCheck)
         {
             printf("Your file is corrupt: packet length is too short");
             return EX_USAGE;
@@ -154,18 +154,18 @@ main(int argc, char *argv[])
 
         if(ipv4)
         {
-            padding = (ph.captureLength - etherIpUdp) - total;
+            padding = (ph->captureLength - etherIpUdp) - total;
         }
         else 
         {
-            padding = (ph.captureLength - etherIp6Udp) - total;
+            padding = (ph->captureLength - etherIp6Udp) - total;
         }
 
         union PayloadStructs *zerged;
 
-        int type = zh.version & 0x0f;
+        int type = zh->version & 0x0f;
 
-        ip.version = ip.version >> 4;
+        ip->version = ip->version >> 4;
 
         print_zerg_header(zh);
 
