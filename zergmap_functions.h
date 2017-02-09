@@ -186,16 +186,16 @@ struct EncodeGps
 //Used to print and format payloads in decode.c
 union PayloadStructs
 {
-    struct StatusPacket stat;
-    struct MessagePacket mess;
-    struct CommandPacket comm;
-    struct GpsPacket gps;
+    struct StatusPacket *stat;
+    struct MessagePacket *mess;
+    struct CommandPacket *comm;
+    struct GpsPacket *gps;
 };
 
 union PayloadStructs *struct_init(int total, FILE * decode_file);
 double doub_converter(uint64_t * number);
 uint64_t doub_flip(uint32_t * lat_long, uint32_t * long_lat);
-void print_zerg_header(struct ZergHeader zerg);
+void print_zerg_header(struct ZergHeader *zerg);
 float converter(uint32_t * thing);
 const char *raceId(uint32_t type);
 char *decode_message(int total, FILE * decode_file);
