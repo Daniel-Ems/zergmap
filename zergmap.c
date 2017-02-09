@@ -66,7 +66,9 @@ main(int argc, char *argv[])
 
     int padding;
     int nextPos;
-
+    int ipVer = 0;
+    bool ipv4 = false; //if false means it is ipv6;
+    size_t lengthCheck;
     puts("");
     do
     {
@@ -89,13 +91,27 @@ main(int argc, char *argv[])
         }
 
         struct Ipv4Header ip;
-
-        fCheck = fread(&ip, sizeof(ip), 1, decodeFile);
-        if (fCheck != 1)
+        struct Ipv6Header ip6;
+        ipVer = eh.type;
+        if(ipVer == 8)
         {
-            break;
-        }
 
+            fCheck = fread(&ip, sizeof(ip), 1, decodeFile);
+             if (fCheck != 1)
+             {
+                break;
+             }
+            ipv4 = true;
+        }
+        else
+        {
+            
+            fCheck = fread(&ip6, 40, 1, decodeFile);
+            if (fCheck !=1)
+            {
+                break;
+            }
+        }
         struct UdpHeader udp;
 
         fCheck = fread(&udp, sizeof(udp), 1, decodeFile);
@@ -121,7 +137,14 @@ main(int argc, char *argv[])
         }
 
         //Error Checking. 
-        size_t lengthCheck = etherIpUdp + total;
+        if(ipv4)
+        {
+            lengthCheck = etherIpUdp + total;
+        }
+        else
+        {
+            lengthCheck = etherIp6Udp + total;
+        }
 
         if (ph.captureLength < lengthCheck)
         {
@@ -129,7 +152,14 @@ main(int argc, char *argv[])
             return EX_USAGE;
         }
 
-        padding = (ph.captureLength - etherIpUdp) - total;
+        if(ipv4)
+        {
+            padding = (ph.captureLength - etherIpUdp) - total;
+        }
+        else 
+        {
+            padding = (ph.captureLength - etherIp6Udp) - total;
+        }
 
         union PayloadStructs *zerged;
 
