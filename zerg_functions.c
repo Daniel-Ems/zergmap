@@ -2,16 +2,24 @@
 #include "zergmap_functions.h"
 
 union PayloadStructs *
-struct_init(int total, FILE * decodeFile)
+struct_init(int total, FILE * decodeFile, int type)
 {
     int fCheck;
-    union PayloadStructs *memory =
-        calloc((total - zerg_header_length + 1), 1);
+    union PayloadStructs *memory = calloc(1, sizeof(*memory) );
     if (!memory)
     {
         printf("NO MALLOC");
     }
-    fCheck = fread(memory, total - zerg_header_length, 1, decodeFile);
+	if(type == 0)
+	{
+		memory->mess.message = calloc(1, (total - zerg_header_length) +1);
+		fCheck = fread(memory->mess.message, sizeof(memory->mess.message), 
+						(total - zerg_header_length), decodeFile);
+	}
+	else
+	{
+   		 fCheck = fread(memory, total - zerg_header_length, 1, decodeFile);
+	}
     if (fCheck != 1)
     {
         memory = NULL;
