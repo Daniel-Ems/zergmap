@@ -26,6 +26,11 @@ enum
 enum
 { etherIp6Udp = 14 + 40 + 8};
 
+enum
+{ udpProtocol = 17};
+enum
+{ eat = 3751};
+
 //Used to read/write in the file header
 struct FileHeader
 {
