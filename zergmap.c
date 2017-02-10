@@ -107,6 +107,10 @@ main(int argc, char *argv[])
              {
                 break;
              }
+            if(ip->protocol != udpProtocol)
+            {
+                break;
+            }
             ipv4 = true;
         }
         else
@@ -114,6 +118,10 @@ main(int argc, char *argv[])
             
             fCheck = fread(ip6, sizeof(*ip6), 1, decodeFile);
             if (fCheck !=1)
+            {
+                break;
+            }
+            if(ip6->next != udpProtocol)
             {
                 break;
             }
@@ -125,9 +133,12 @@ main(int argc, char *argv[])
         {
             break;
         }
+        if(ntohs(udp->d_port) != eat)
+		{
+			break;
+		}
 
-        
-
+       
         fCheck = fread(zh, sizeof(*zh), 1, decodeFile);
         if (fCheck != 1)
         {
@@ -170,6 +181,7 @@ main(int argc, char *argv[])
         union PayloadStructs *zerged;
 
         int type = zh->version & 0x0f;
+        int zerg_header = type;
 
         ip->version = ip->version >> 4;
 
@@ -182,7 +194,6 @@ main(int argc, char *argv[])
             return EX_USAGE;
         }
 
-        int zerg_header = type;
 
         switch (zerg_header)
         {
