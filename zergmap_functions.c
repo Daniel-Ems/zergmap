@@ -1,132 +1,157 @@
 #include "zerg_functions.h"
 #include "zergmap_functions.h"
-#include <stdbool.h>
 
-void
-messFunction(union PayloadStructs *zerg)
+union PayloadStructs *
+struct_init(int total, FILE * decodeFile, int type)
 {
+    int fCheck;
+    union PayloadStructs *memory = calloc(1, sizeof(*memory) );
+    if (!memory)
+    {
+        printf("NO MALLOC");
+		return memory;
+    }
+	if(type == 0)
+	{
+		memory->mess.message = calloc(1, (total - zerg_header_length) +1);
 
-    printf("Message : %s\n", zerg->mess.message);
-	free(zerg->mess.message);
-    free(zerg);
+		fCheck = fread(memory->mess.message, (total - zerg_header_length), 1
+						, decodeFile);
+	}
+	else
+	{
+   		 fCheck = fread(memory, total - zerg_header_length, 1, decodeFile);
+	}
+    if (fCheck != 1)
+    {
+        memory = NULL;
+    }
+    return memory;
+}
 
+//Conceptually Explained by Dow
+float
+converter(uint32_t * thing)
+{
+    union converter
+    {
+        float speed;
+        uint32_t test;
+    };
+    union converter speed_test;
+
+    speed_test.test = ntohl(*thing);
+    float speedy = speed_test.speed;
+
+    return speedy;
 }
 
 void
-statFunction(union PayloadStructs *zerg)
+print_zerg_header(struct ZergHeader *zerg)
 {
-    uint32_t armor = ntohl(zerg->stat.hit_armor) & 0xf;
 
-    zerg->stat.hit_armor = ntohl(zerg->stat.hit_armor) >> 8;
-    int32_t type = ntohl(zerg->stat.max_type) & 0xf;
+    zerg->version = (zerg->version & 0x10) >> 4;
 
-    zerg->stat.max_type = ntohl(zerg->stat.max_type) >> 8;
-
-    float speedy = converter(&zerg->stat.speed);
-
-    const char *race;
-
-    race = raceId(type);
-
-    printf("Name    : %s\n", zerg->stat.name);
-    printf("HP      : %d/%d\n", zerg->stat.hit_armor, zerg->stat.max_type);
-    printf("Type    : %s\n", race);
-    printf("Armor   : %d\n", armor);
-    printf("Maxspeed: %fm/s\n", speedy);
-    free(zerg);
+    printf("Version : %d\n", zerg->version);
+    printf("Sequence: %d\n", ntohl(zerg->id));
+    printf("From    : %d\n", ntohs(zerg->source));
+    printf("To      : %d\n", ntohs(zerg->dest));
 }
 
-void
-commFunction(union PayloadStructs *zerg)
-{
-    uint32_t command = ntohs(zerg->comm.command);
 
-    switch (command)
+//compliments of DOW 
+uint64_t
+doub_flip(uint32_t * most, uint32_t * least)
+{
+
+    uint64_t flipped_double;
+
+    *most = ntohl(*most);
+    *least = ntohl(*least);
+
+    flipped_double = *most;
+    flipped_double = flipped_double << 32;
+    flipped_double = flipped_double + *least;
+
+    return flipped_double;
+}
+
+//Conceptually explained by Dow
+double
+doub_converter(uint64_t * number)
+{
+    union doub_converter
+    {
+        double place_holder;
+        uint64_t old_number;
+    };
+    union doub_converter conversion;
+
+    conversion.old_number = *number;
+    double new_number = conversion.place_holder;
+
+    return new_number;
+}
+
+const char *
+raceId(uint32_t type)
+{
+    const char *raceId = "No type";
+
+    switch (type)
     {
     case (0):
-        printf("GET_STATUS\n");
+        raceId = "Overmind";
         break;
     case (1):
-        printf("GOTO\n");
-        float location = converter(&zerg->comm.parameter_two);
-
-        printf("Bearing: %f\n", location);
-        printf("Distance: %dm\n", ntohs(zerg->comm.parameter_one));
+        raceId = "Larva";
         break;
     case (2):
-        printf("GET_GPS\n");
+        raceId = "Cerebrate";
+        break;
+    case (3):
+        raceId = "Overlord";
         break;
     case (4):
-        printf("RETURN\n");
+        raceId = "Queen";
         break;
     case (5):
-        printf("SET_GROUP\n");
-        if (zerg->comm.parameter_one)
-        {
-            printf("Add zerg to: %d\n", zerg->comm.parameter_two);
-        }
-        else
-        {
-            printf("Remove zerg from: %d\n", zerg->comm.parameter_two);
-        }
+        raceId = "Drone";
         break;
     case (6):
-        printf("STOP\n");
+        raceId = "Zergling";
         break;
     case (7):
-        printf("REPEAT %d\n", ntohl(zerg->comm.parameter_two));
+        raceId = "Lurker";
+        break;
+    case (8):
+        raceId = "Brooding";
+        break;
+    case (9):
+        raceId = "Hydralisk";
+        break;
+    case (10):
+        raceId = "Guardian";
+        break;
+    case (11):
+        raceId = "Scourge";
+        break;
+    case (12):
+        raceId = "Ultralisk";
+        break;
+    case (13):
+        raceId = "Mutalisk";
+        break;
+    case (14):
+        raceId = "Defiler";
+        break;
+    case (15):
+        raceId = "Devourer";
         break;
     default:
-        printf("Packet Corrupt");
+        return raceId;
         break;
+
     }
-    free(zerg);
-}
-
-void
-gpsFunction(union PayloadStructs *zerg)
-{
-
-
-    uint64_t lat = doub_flip(&zerg->gps.lat_first, &zerg->gps.lat_second);
-    double latitude = doub_converter(&lat);
-
-    if (latitude >= 1)
-    {
-        printf("latitude : %lf deg. N\n", latitude);
-    }
-    else
-    {
-        printf("latitude : %lf deg. S\n", latitude * (-1));
-    }
-
-    uint64_t lon = doub_flip(&zerg->gps.long_first, &zerg->gps.long_second);
-    double longitude = doub_converter(&lon);
-
-    if (longitude >= 1)
-    {
-        printf("longitude: %lf deg. E\n", longitude);
-    }
-    else
-    {
-        printf("longitude: %lf deg. W\n", longitude * (-1));
-    }
-
-    float altitude = converter(&zerg->gps.altitude);
-
-    printf("altitude : %.1fm\n", altitude * 1.8288);
-
-    float bearing = converter(&zerg->gps.bearing);
-
-    printf("bearing  : %f deg.\n", bearing);
-
-    float speed = converter(&zerg->gps.speed);
-
-    printf("speed    : %.fkm/h\n", speed * 3.6);
-
-    float accuracy = converter(&zerg->gps.accuracy);
-
-    printf("accuracy : %.fm\n", accuracy);
-    free(zerg);
-
+    return raceId;
 }
