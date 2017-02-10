@@ -146,7 +146,7 @@ main(int argc, char *argv[])
         if (total < 12)
         {
             printf("Packet Corrupt: Bad Zerg Size\n");
-            return EX_USAGE;
+            break;
         }
 
         //Error Checking. 
@@ -185,7 +185,7 @@ main(int argc, char *argv[])
 
         if (zerged == NULL)
         {
-            return EX_USAGE;
+            break;
         }
 
         switch (zerg_header)
