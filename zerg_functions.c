@@ -9,12 +9,14 @@ struct_init(int total, FILE * decodeFile, int type)
     if (!memory)
     {
         printf("NO MALLOC");
+		return memory;
     }
 	if(type == 0)
 	{
 		memory->mess.message = calloc(1, (total - zerg_header_length) +1);
-		fCheck = fread(memory->mess.message, sizeof(memory->mess.message), 
-						(total - zerg_header_length), decodeFile);
+
+		fCheck = fread(memory->mess.message, (total - zerg_header_length), 1
+						, decodeFile);
 	}
 	else
 	{

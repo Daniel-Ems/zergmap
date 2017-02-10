@@ -10,58 +10,68 @@ main(int argc, char *argv[])
 
     FILE *decodeFile;
 
-    if (argc < 2)
+	  if (argc < 2)
     {
         printf("Please provide a file to be decoded\n");
         return EX_USAGE;
     }
-    else
+
+	struct stat *buffer = malloc (sizeof (*buffer));
+	
+  	int i = 1;
+  	off_t fileEnd;
+
+	 for (i = 1; i < argc; i++)
     {
-        decodeFile = fopen(argv[1], "rb");
-        if (!decodeFile)
-        {
-            return EX_USAGE;
-        }
+      stat (argv[i], buffer);
+      fileEnd = buffer->st_size;
+      if (fileEnd == 0)
+	{
+	  printf ("Empty Files not allowed\n");
+	  goto cleanup1;
+	}
     }
 
-    fseek(decodeFile, 0, SEEK_END);
-    int lastPos = ftell(decodeFile);
-
-    rewind(decodeFile);
-    int start = ftell(decodeFile);
-
-    if (lastPos == start)
-    {
-        printf("Your file is empty, please give me a file with pcaps\n");
-        return EX_USAGE;
-    }
-
+	struct FileHeader *fh = malloc(sizeof(*fh));
+	struct PcapHeader *ph = malloc(sizeof(*ph));
+    struct EthernetFrame *eh = malloc(sizeof(*eh));
+    struct Ipv4Header *ip = malloc(sizeof(*ip)); 
+    struct Ipv6Header *ip6 = malloc(sizeof(*ip6)); 
+    struct UdpHeader *udp = malloc(sizeof(*udp));
+    struct ZergHeader *zh = malloc(sizeof(*zh)); 
+	union PayloadStructs *zerged;
+ 	int files = 1;
     int fCheck;
-    struct FileHeader *fh = malloc(sizeof(*fh));
+	uint32_t magicNumber = 0xa1b2c3d4;
+
+   while(argv[files])
+	{
+	decodeFile = fopen(argv[files], "rb");
+    if (!decodeFile)
+   	{
+	  continue;
+    }
 
     fCheck = fread(fh, sizeof(*fh), 1, decodeFile);
     if (fCheck != 1)
     {
         fprintf(decodeFile,
-                "Your file header was not read. Program terminated");
-        return EX_USAGE;
+         "Your file header was not read. File ignored.");
+		continue;
     }
 
-    uint32_t magicNumber = 0xa1b2c3d4;
-
+   
     if (fh->fileType != magicNumber)
     {
-        printf("Wrong Endianess or no pcap\n");
-        return EX_USAGE;
+        printf("Wrong Endianess or no pcap, File ignored\n");
+        continue;
     }
 
-
-    uint32_t linkCheck = 0x1;
 
     if (fh->linkLayer != linkCheck)
     {
         printf("Wrong link layer\n");
-        return EX_USAGE;
+        continue;
     }
 
     int padding;
@@ -70,26 +80,15 @@ main(int argc, char *argv[])
     bool ipv4 = false; //if false means it is ipv6;
     size_t lengthCheck;
 
-    struct PcapHeader *ph = malloc(sizeof(*ph));
-    struct EthernetFrame *eh = malloc(sizeof(*eh));
-    struct Ipv4Header *ip = malloc(sizeof(*ip));
-    struct Ipv6Header *ip6 = malloc(sizeof(*ip6));
-    struct UdpHeader *udp = malloc(sizeof(*udp));
-    struct ZergHeader *zh = malloc(sizeof(*zh));
     puts("");
     do
     {
-
-       
-
+	    
         fCheck = fread(ph, sizeof(*ph), 1, decodeFile);
         if (fCheck != 1)
         {
             break;
         }
-
-
-        
 
         fCheck = fread(eh, sizeof(*eh), 1, decodeFile);
         if (fCheck != 1)
@@ -97,11 +96,10 @@ main(int argc, char *argv[])
             break;
         }
 
-        
         ipVer = eh->type;
         if(ipVer == 8)
         {
-
+ 
             fCheck = fread(ip, sizeof(*ip), 1, decodeFile);
              if (fCheck != 1)
              {
@@ -115,7 +113,7 @@ main(int argc, char *argv[])
         }
         else
         {
-            
+            	    
             fCheck = fread(ip6, sizeof(*ip6), 1, decodeFile);
             if (fCheck !=1)
             {
@@ -126,8 +124,7 @@ main(int argc, char *argv[])
                 break;
             }
         }
-        
-
+         
         fCheck = fread(udp, sizeof(*udp), 1, decodeFile);
         if (fCheck != 1)
         {
@@ -138,7 +135,6 @@ main(int argc, char *argv[])
 			break;
 		}
 
-       
         fCheck = fread(zh, sizeof(*zh), 1, decodeFile);
         if (fCheck != 1)
         {
@@ -178,8 +174,6 @@ main(int argc, char *argv[])
             padding = (ph->captureLength - etherIp6Udp) - total;
         }
 
-        union PayloadStructs *zerged;
-
         int type = zh->version & 0x0f;
         int zerg_header = type;
 
@@ -193,7 +187,6 @@ main(int argc, char *argv[])
         {
             return EX_USAGE;
         }
-
 
         switch (zerg_header)
         {
@@ -214,7 +207,11 @@ main(int argc, char *argv[])
         fseek(decodeFile, padding, SEEK_CUR);
         nextPos = ftell(decodeFile);
         puts("");
-    } while (nextPos != lastPos);
+
+    } while (nextPos != fileEnd);
+	files++;
+    fclose(decodeFile);
+	}
 
     free(zh);
     free(udp);
@@ -223,5 +220,6 @@ main(int argc, char *argv[])
     free(eh);
     free(ph);
     free(fh);
-    fclose(decodeFile);
+cleanup1:
+	free(buffer);
 }
