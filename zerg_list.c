@@ -11,7 +11,7 @@
 #include "zergmap_functions.h"
 #include "zerg_list.h"
 
-vertex *insertVertex(vertex *front, int id, uint64_t lon, uint64_t lat){
+vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 
 	
 		vertex *insert=(vertex*)malloc(sizeof(vertex));
@@ -24,6 +24,7 @@ vertex *insertVertex(vertex *front, int id, uint64_t lon, uint64_t lat){
 		insert->id=id;
 		insert->lat=lat;
 		insert->lon=lon;
+		insert->alt = alt;
 		insert->next=NULL;
 		insert->adj = NULL;
 		insert->next=front;
