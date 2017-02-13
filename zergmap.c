@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include "zergmap_functions.h"
 #include "zerg_functions.h"
-
+#include "zerg_list.h"
 int
 main(int argc, char *argv[])
 {
@@ -43,7 +43,7 @@ main(int argc, char *argv[])
  	int files = 1;
     int fCheck;
 	uint32_t magicNumber = 0xa1b2c3d4;
-
+	vertex *zergNode = NULL;
    while(argv[files])
 	{
 	decodeFile = fopen(argv[files], "rb");
@@ -79,6 +79,7 @@ main(int argc, char *argv[])
     int ipVer = 0;
     bool ipv4 = false; //if false means it is ipv6;
     size_t lengthCheck;
+
 
     puts("");
     do
@@ -191,16 +192,16 @@ main(int argc, char *argv[])
         switch (zerg_header)
         {
         case (0): 
-            messFunction(zerged);
+            //messFunction(zerged);
             break;
         case (1):
-            statFunction(zerged);
+            //statFunction(zerged);
             break;
         case (2):
-            commFunction(zerged);
+            //commFunction(zerged);
             break;
         case (3):
-            gpsFunction(zerged);
+            zergNode = gpsFunction(zergNode, zerged, zh->source);
             break;
         }
 
@@ -211,6 +212,11 @@ main(int argc, char *argv[])
     } while (nextPos != fileEnd);
 	files++;
     fclose(decodeFile);
+	}
+	while(zergNode)
+	{
+		printf("id %d\n", zergNode -> id);
+		zergNode = zergNode -> next;
 	}
 
     free(zh);
