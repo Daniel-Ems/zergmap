@@ -10,8 +10,9 @@
 
 typedef struct vertex{
 	int id;
-	uint64_t lat;
-	uint64_t lon;
+	double lat;
+	double lon;
+	float alt;
 	struct vertex *next;
 	struct edge* adj;
 }vertex;
@@ -22,7 +23,7 @@ typedef struct edge{
 	struct edge* next;
 }edge;
 
-vertex *insertVertex(vertex *front, int id, uint64_t lon, uint64_t lat);
+vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt);
 edge * insertEdge(edge *front, int id, int weight);
 
 #endif
