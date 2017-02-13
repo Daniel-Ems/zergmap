@@ -7,13 +7,14 @@
 #include <string.h>
 #include <stdint.h>
 #include <arpa/inet.h>
+#include "zerg_list.h"
 
 
 extern union PayloadStructs *zerg;
 void messFunction(union PayloadStructs *zerg);
 void statFunction(union PayloadStructs *zerg);
 void commFunction(union PayloadStructs *zerg);
-void gpsFunction(union PayloadStructs *zerg);
+vertex* gpsFunction(vertex *zergNode, union PayloadStructs *zerg, uint32_t id);
 
 
 #endif
