@@ -29,13 +29,13 @@ statFunction(union PayloadStructs *zerg)
 
     race = raceId(type);
 
-	/*
+	
     printf("Name    : %s\n", zerg->stat.name);
     printf("HP      : %d/%d\n", zerg->stat.hit_armor, zerg->stat.max_type);
     printf("Type    : %s\n", race);
     printf("Armor   : %d\n", armor);
     printf("Maxspeed: %fm/s\n", speedy);
-	*/
+	
     free(zerg);
 }
 
@@ -86,8 +86,8 @@ commFunction(union PayloadStructs *zerg)
     free(zerg);
 }
 
-void
-gpsFunction(union PayloadStructs *zerg)
+vertex *
+gpsFunction(vertex *zergNode, union PayloadStructs *zerg, uint32_t zergId)
 {
 
 
@@ -102,29 +102,18 @@ gpsFunction(union PayloadStructs *zerg)
     uint64_t lon = doub_flip(&zerg->gps.long_first, &zerg->gps.long_second);
     double longitude = doub_converter(&lon);
 
-    if (longitude >= 1)
+    if (longitude < 1)
     {
         longitude *= (-1);
 	}
   
-	
-
     float altitude = converter(&zerg->gps.altitude);
 
-    //printf("altitude : %.1fm\n", altitude * 1.8288);
+	int id = ntohs(zergId);
 
-    float bearing = converter(&zerg->gps.bearing);
+	zergNode = insertVertex(zergNode, id, longitude, latitude, altitude); 
 
-    //printf("bearing  : %f deg.\n", bearing);
-
-    //float speed = converter(&zerg->gps.speed);
-
-    //printf("speed    : %.fkm/h\n", speed * 3.6);
-
-    //float accuracy = converter(&zerg->gps.accuracy);
-
-    //printf("accuracy : %.fm\n", accuracy);
-	
     free(zerg);
-	return 
+	return zergNode;
+
 }
