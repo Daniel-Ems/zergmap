@@ -42,14 +42,18 @@ main(int argc, char *argv[])
     struct UdpHeader *udp = malloc(sizeof(*udp));
     struct ZergHeader *zh = malloc(sizeof(*zh)); 
 	union PayloadStructs *zerged;
-
+	int padding;
+    int nextPos;
+    int ipVer = 0;
+    bool ipv4 = false; //if false means it is ipv6;
+    size_t lengthCheck;
 
  	int files = 1;
     int fCheck;
 	uint32_t magicNumber = 0xa1b2c3d4;
 	vertex *zergNode = NULL;
 
-   while(argv[files] && files < argc - 1 )
+   while(argv[files] && files <= argc -1)
 	{
 	decodeFile = fopen(argv[files], "rb");
     if (!decodeFile)
@@ -67,7 +71,6 @@ main(int argc, char *argv[])
 		fclose(decodeFile);
 		continue;
     }
-
    
     if (fh->fileType != magicNumber)
     {
@@ -77,7 +80,6 @@ main(int argc, char *argv[])
         continue;
     }
 
-
     if (fh->linkLayer != linkCheck)
     {
         printf("Wrong link layer\n");
@@ -86,14 +88,7 @@ main(int argc, char *argv[])
         continue;
     }
 
-    int padding;
-    int nextPos;
-    int ipVer = 0;
-    bool ipv4 = false; //if false means it is ipv6;
-    size_t lengthCheck;
-
-
-    puts("");
+    //puts("");
     do
     {
 	    
@@ -155,7 +150,7 @@ main(int argc, char *argv[])
         }
 
         int total = ntohl(zh->version) & 0xffffff;
-
+		
         if (total < 12)
         {
             printf("Packet Corrupt: Bad Zerg Size\n");
@@ -188,13 +183,17 @@ main(int argc, char *argv[])
         }
 
         int type = zh->version & 0x0f;
+		
         int zerg_header = type;
 
         ip->version = ip->version >> 4;
 
-        print_zerg_header(zh);
+        //print_zerg_header(zh);
       
-        zerged = struct_init(total, decodeFile, type);
+		if(type == 1 || type == 3)
+		{
+        	zerged = struct_init(total, decodeFile, type);
+		}
 
         if (zerged == NULL)
         {
@@ -203,14 +202,8 @@ main(int argc, char *argv[])
 
         switch (zerg_header)
         {
-        case (0): 
-            //messFunction(zerged);
-            break;
         case (1):
-            //statFunction(zerged);
-            break;
-        case (2):
-            //commFunction(zerged);
+            statFunction(zerged);
             break;
         case (3):
             zergNode = gpsFunction(zergNode, zerged, zh->dest);
@@ -219,19 +212,16 @@ main(int argc, char *argv[])
 
         fseek(decodeFile, padding, SEEK_CUR);
         nextPos = ftell(decodeFile);
-        puts("");
+        //puts("");
 
     } while (nextPos != fileEnd);
 	files++;
     fclose(decodeFile);
 	}
 
-
-	//TODO destroy list
-	printList(zergNode);
+	//printList(zergNode);
 	
 	printAdj(zergNode);
-	
 	
 	destroy(zergNode);
 	
