@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <sysexits.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "zergmap_functions.h"
 #include "zerg_functions.h"
 #include "zerg_list.h"
@@ -40,15 +42,19 @@ main(int argc, char *argv[])
     struct UdpHeader *udp = malloc(sizeof(*udp));
     struct ZergHeader *zh = malloc(sizeof(*zh)); 
 	union PayloadStructs *zerged;
+
+
  	int files = 1;
     int fCheck;
 	uint32_t magicNumber = 0xa1b2c3d4;
 	vertex *zergNode = NULL;
-   while(argv[files])
+
+   while(argv[files] && files < argc - 1 )
 	{
 	decodeFile = fopen(argv[files], "rb");
     if (!decodeFile)
    	{
+	  files++;
 	  continue;
     }
 
@@ -57,6 +63,8 @@ main(int argc, char *argv[])
     {
         fprintf(decodeFile,
          "Your file header was not read. File ignored.");
+		files++;
+		fclose(decodeFile);
 		continue;
     }
 
@@ -64,6 +72,8 @@ main(int argc, char *argv[])
     if (fh->fileType != magicNumber)
     {
         printf("Wrong Endianess or no pcap, File ignored\n");
+		files++;
+		fclose(decodeFile);
         continue;
     }
 
@@ -71,6 +81,8 @@ main(int argc, char *argv[])
     if (fh->linkLayer != linkCheck)
     {
         printf("Wrong link layer\n");
+		files++;
+		fclose(decodeFile);
         continue;
     }
 
@@ -201,7 +213,7 @@ main(int argc, char *argv[])
             //commFunction(zerged);
             break;
         case (3):
-            zergNode = gpsFunction(zergNode, zerged, zh->source);
+            zergNode = gpsFunction(zergNode, zerged, zh->dest);
             break;
         }
 
@@ -213,12 +225,11 @@ main(int argc, char *argv[])
 	files++;
     fclose(decodeFile);
 	}
-	while(zergNode)
-	{
-		printf("id %d\n", zergNode -> id);
-		zergNode = zergNode -> next;
-	}
 
+
+	//TODO destroy list
+	destroy(zergNode);
+	
     free(zh);
     free(udp);
     free(ip6);
