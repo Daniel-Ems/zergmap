@@ -35,7 +35,7 @@ vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 	return front;
 }
 
-edge * insertEdge(edge *front, int id, int weight){
+edge * insertEdge(edge *front, int id, double weight){
 
 	// create new node
 	edge *insert=(edge *)malloc(sizeof(edge));
@@ -61,9 +61,18 @@ void destroy(vertex *front)
 
 	vertex *cursor;
 	cursor=front;
+	edge *edge;
 
 	while(cursor!=NULL)
 	{
+		edge = cursor->adj;
+		while(edge)
+		{
+			cursor->adj = cursor->adj->next;
+			free(edge);
+			edge = cursor->adj;
+		}
+
 		front=front->next;
 		free(cursor);
 		cursor=front;
@@ -97,7 +106,7 @@ double haversine(double lat1, double lon1, double lat2, double lon2)
 	lat2 *= TO_RAD;
  
 	dz = sin(lat1) - sin(lat2);
-	dx = cos(lon1) * cos(lon1) - cos(lat2);
+	dx = cos(lon1) * cos(lat1) - cos(lat2);
 	dy = sin(lon1) * cos(lat1);
 	return (asin(sqrt(dx * dx + dy * dy + dz * dz) / 2) * 2 * R) * 1000;
 }
@@ -110,3 +119,31 @@ double pythagorean(float alt1, float alt2, double haversine)
 	cSqr = aSqr+bSqr;
 	return sqrt(cSqr);
 }
+
+
+
+void printAdj(vertex *zergNode)
+{
+	vertex *cursor;
+	cursor = zergNode;
+	edge *edge;
+	while(cursor != NULL)
+	{	
+		edge = cursor->adj;
+		printf("cursor id-> %d\n", cursor->id);
+		while(edge !=NULL)
+		{
+			printf("adj id -> %d\n", edge->id);
+			edge = edge -> next;
+		}
+		cursor = cursor->next;
+
+		puts(" ");
+	}
+}
+				
+					
+	
+
+
+
