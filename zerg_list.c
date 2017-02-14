@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <arpa/inet.h>
-
+#include <math.h>
 #include "zerg_functions.h"
 #include "zergmap_functions.h"
 #include "zerg_list.h"
@@ -54,7 +54,7 @@ edge * insertEdge(edge *front, int id, int weight){
 	return front;
 }
 
-
+	
 void destroy(vertex *front)
 {
 	
@@ -83,4 +83,30 @@ void printList(vertex *front)
 		cursor = cursor->next;
 		puts(" ");
 	}
+}
+
+//http://rosettacode.org/wiki/Haversine_formula#C
+double haversine(double lat1, double lon1, double lat2, double lon2)
+{
+	double R = 6371;
+	double TO_RAD = (3.1415926536 / 180);
+	double dx, dy, dz;
+	lon1 -= lon2;
+	lon1 *= TO_RAD;
+	lat1 *= TO_RAD; 
+	lat2 *= TO_RAD;
+ 
+	dz = sin(lat1) - sin(lat2);
+	dx = cos(lon1) * cos(lon1) - cos(lat2);
+	dy = sin(lon1) * cos(lat1);
+	return (asin(sqrt(dx * dx + dy * dy + dz * dz) / 2) * 2 * R) * 1000;
+}
+
+double pythagorean(float alt1, float alt2, double haversine)
+{
+	double aSqr, bSqr, cSqr;
+	aSqr = pow((alt1+alt2),2);
+	bSqr = pow(haversine, 2);
+	cSqr = aSqr+bSqr;
+	return sqrt(cSqr);
 }
