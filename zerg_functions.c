@@ -89,7 +89,10 @@ commFunction(union PayloadStructs *zerg)
 vertex *
 gpsFunction(vertex *zergNode, union PayloadStructs *zerg, uint32_t zergId)
 {
-
+ 
+	double haves;
+	int id = ntohs(zergId);
+    float altitude = converter(&zerg->gps.altitude);
 
     uint64_t lat = doub_flip(&zerg->gps.lat_first, &zerg->gps.lat_second);
     double latitude = doub_converter(&lat);
@@ -107,12 +110,25 @@ gpsFunction(vertex *zergNode, union PayloadStructs *zerg, uint32_t zergId)
         longitude *= (-1);
 	}
   
-    float altitude = converter(&zerg->gps.altitude);
-
-	int id = ntohs(zergId);
-
+	
+	vertex *cursor = zergNode;
 	zergNode = insertVertex(zergNode, id, longitude, latitude, altitude); 
-
+	while(cursor)
+	{
+		haves = haversine(latitude, longitude, cursor->lat, cursor->lon);
+		if(altitude || cursor->alt)
+		{
+			haves = pythagorean(altitude, cursor->alt, haves);
+		}
+		if(haves < 15)
+		{
+			cursor->adj = insertEdge(cursor->adj, id, haves);
+			zergNode->adj = insertEdge(zergNode->adj, cursor->id, haves);
+		}
+		cursor = cursor -> next;
+	}
+	
+	
     free(zerg);
 	return zergNode;
 
