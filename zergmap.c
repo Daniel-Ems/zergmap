@@ -228,6 +228,7 @@ main(int argc, char *argv[])
 
 
 	//TODO destroy list
+	printList(zergNode);
 	destroy(zergNode);
 	
     free(zh);
