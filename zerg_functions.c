@@ -116,7 +116,7 @@ gpsFunction(vertex *zergNode, union PayloadStructs *zerg, uint32_t zergId)
 	while(cursor)
 	{
 		haves = haversine(latitude, longitude, cursor->lat, cursor->lon);
-		if(altitude || cursor->alt)
+		if((int)altitude || (int)cursor->alt)
 		{
 			haves = pythagorean(altitude, cursor->alt, haves);
 		}
