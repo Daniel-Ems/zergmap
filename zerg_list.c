@@ -11,6 +11,7 @@
 #include "zergmap_functions.h"
 #include "zerg_list.h"
 
+//All of these functions were taken from the Linked List section of DSAI
 vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 
 	
@@ -51,4 +52,20 @@ edge * insertEdge(edge *front, int id, int weight){
 	insert->next=front;
 	front=insert; // notice how the newest code is considered front now
 	return front;
+}
+
+
+void destroy(vertex *front)
+{
+	
+
+	vertex *cursor;
+	cursor=front;
+
+	while(cursor!=NULL)
+	{
+		front=front->next;
+		free(cursor);
+		cursor=front;
+	}
 }
