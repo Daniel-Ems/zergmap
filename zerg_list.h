@@ -25,5 +25,6 @@ typedef struct edge{
 
 vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt);
 edge * insertEdge(edge *front, int id, int weight);
+void destroy(vertex *front);
 
 #endif
