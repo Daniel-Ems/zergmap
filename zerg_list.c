@@ -69,3 +69,18 @@ void destroy(vertex *front)
 		cursor=front;
 	}
 }
+
+void printList(vertex *front)
+{
+	vertex *cursor;
+	cursor = front;
+	while(cursor != NULL)
+	{
+		printf("id -> %d\n", cursor ->id);
+		printf("lat -> %lf\n", cursor->lat);
+		printf("lon -> %lf\n", cursor->lon);
+		printf("alt -> %f\n", cursor ->alt);
+		cursor = cursor->next;
+		puts(" ");
+	}
+}
