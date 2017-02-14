@@ -134,6 +134,7 @@ void printAdj(vertex *zergNode)
 		while(edge !=NULL)
 		{
 			printf("adj id -> %d\n", edge->id);
+			printf("adj haves ->%lf\n", edge->weight);
 			edge = edge -> next;
 		}
 		cursor = cursor->next;
