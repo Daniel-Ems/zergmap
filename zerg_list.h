@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 
+
+
 typedef struct vertex{
 	int id;
 	double lat;
@@ -25,7 +27,9 @@ typedef struct edge{
 
 vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt);
 edge * insertEdge(edge *front, int id, int weight);
-void destroy(vertex *front);
+double haversine(double lat1, double lon1, double lat2, double lon2);
+double pythagorean(float alt1, float alt2, double haversine);
 void printList(vertex *front);
+void destroy(vertex *front);
 
 #endif
