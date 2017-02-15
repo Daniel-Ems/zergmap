@@ -1,15 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <arpa/inet.h>
-#include <math.h>
-#include "zerg_functions.h"
-#include "zergmap_functions.h"
 #include "zerg_list.h"
+
 
 //All of these functions were taken from the Linked List section of DSAI
 vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
@@ -142,6 +132,7 @@ void printAdj(vertex *zergNode)
 		puts(" ");
 	}
 }
+
 				
 					
 	
