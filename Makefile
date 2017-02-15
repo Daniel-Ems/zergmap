@@ -9,8 +9,7 @@ all=zergmap
 
 bins: $(all)
 
-zergmap: zergmap.o zergmap_functions.o zerg_functions.o zerg_list.o
-
+zergmap: zergmap.o zergmap_functions.o zerg_functions.o zerg_list.o 
 
 
 .PHONY: clean debug profile
