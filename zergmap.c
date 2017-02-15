@@ -1,11 +1,6 @@
-#include <stdio.h>
-#include <sysexits.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include "zergmap_functions.h"
-#include "zerg_functions.h"
-#include "zerg_list.h"
+
+#include "zergmap.h"
+
 int
 main(int argc, char *argv[])
 {
@@ -42,6 +37,7 @@ main(int argc, char *argv[])
     struct UdpHeader *udp = malloc(sizeof(*udp));
     struct ZergHeader *zh = malloc(sizeof(*zh)); 
 	union PayloadStructs *zerged;
+
 	int padding;
     int nextPos;
     int ipVer = 0;
