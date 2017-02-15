@@ -1,6 +1,5 @@
-#include "zerg_functions.h"
 #include "zergmap_functions.h"
-#include "zerg_list.h"
+
 
 union PayloadStructs *
 struct_init(int total, FILE * decodeFile, int type)
