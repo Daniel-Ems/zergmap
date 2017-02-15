@@ -1,21 +1,7 @@
 #ifndef ZERGMAP_FUNCTIONS_H
 #define ZERGMAP_FUNCTIONS_H
 
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdint.h>
-#include <arpa/inet.h>
-#define _GNU_SOURCE
-#include <stdio.h>
-#include <sysexits.h>
-#include <sys/stat.h>
-#include <string.h>
-#include <ctype.h>
-
-
-
+#include "zergmap.h"
 
 enum
 { zerg_header_length = 12 };
