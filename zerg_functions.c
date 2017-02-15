@@ -1,7 +1,5 @@
 #include "zerg_functions.h"
-#include "zergmap_functions.h"
-#include "zerg_list.h"
-#include <stdbool.h>
+
 
 void
 messFunction(union PayloadStructs *zerg)
