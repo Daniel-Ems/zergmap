@@ -1,12 +1,7 @@
 #ifndef ZERG_LIST_H
 #define ZERG_LIST_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <arpa/inet.h>
+#include "zergmap.h"
 
 
 
