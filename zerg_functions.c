@@ -1,4 +1,20 @@
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <arpa/inet.h>
+#define _GNU_SOURCE
+#include <sysexits.h>
+#include <sys/stat.h>
+#include <ctype.h>
+#include <math.h>
+
+#include "healthTree.h"
 #include "zerg_functions.h"
+#include "dijkstra.h"
+#include "zerg_list.h"
+#include "zergmap_functions.h"
 
 
 void
@@ -11,30 +27,22 @@ messFunction(union PayloadStructs *zerg)
 
 }
 
-void
-statFunction(union PayloadStructs *zerg)
+healthTree *
+statFunction(healthTree *tree, union PayloadStructs *zerg,  uint32_t zergId)
 {
-    uint32_t armor = ntohl(zerg->stat.hit_armor) & 0xf;
+   // uint32_t armor = ntohl(zerg->stat.hit_armor) & 0xf;
 
     zerg->stat.hit_armor = ntohl(zerg->stat.hit_armor) >> 8;
-    int32_t type = ntohl(zerg->stat.max_type) & 0xf;
+   // int32_t type = ntohl(zerg->stat.max_type) & 0xf;
 
     zerg->stat.max_type = ntohl(zerg->stat.max_type) >> 8;
 
-    float speedy = converter(&zerg->stat.speed);
-
-    const char *race;
-
-    race = raceId(type);
-
-	
-    printf("Name    : %s\n", zerg->stat.name);
-    printf("HP      : %d/%d\n", zerg->stat.hit_armor, zerg->stat.max_type);
-    printf("Type    : %s\n", race);
-    printf("Armor   : %d\n", armor);
-    printf("Maxspeed: %fm/s\n", speedy);
-	
+  
+	double health = (zerg->stat.hit_armor/ zerg->stat.max_type)*100;
+	tree = insertTree(tree, zergId, health);
+   
     free(zerg);
+	return tree;
 }
 
 void
@@ -121,7 +129,9 @@ gpsFunction(vertex *zergNode, union PayloadStructs *zerg, uint32_t zergId)
 		if(haves < 15)
 		{
 			cursor->adj = insertEdge(cursor->adj, id, haves);
+			cursor->edges+= 1;
 			zergNode->adj = insertEdge(zergNode->adj, cursor->id, haves);
+			zergNode->edges+=1;
 		}
 		cursor = cursor -> next;
 	}
