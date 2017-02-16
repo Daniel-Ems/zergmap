@@ -1,7 +1,11 @@
 #ifndef ZERGMAP_FUNCTIONS_H
 #define ZERGMAP_FUNCTIONS_H
 
-#include "zergmap.h"
+
+#include "zerg_list.h"
+#include "zergmap_functions.h"
+#include "zerg_functions.h"
+#include "dijkstra.h"
 
 enum
 { zerg_header_length = 12 };
