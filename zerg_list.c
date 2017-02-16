@@ -1,4 +1,17 @@
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <arpa/inet.h>
+#define _GNU_SOURCE
+#include <sysexits.h>
+#include <sys/stat.h>
+#include <ctype.h>
+#include <math.h>
+
 #include "zerg_list.h"
+
 
 
 //All of these functions were taken from the Linked List section of DSAI
@@ -11,6 +24,7 @@ vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 			printf("Memory Error\n");
 			return NULL;
 		}
+		printf("!! iv: %d\n",id);
 		// insert data into new node
 		insert->id=id;
 		insert->lat=lat;
@@ -18,11 +32,15 @@ vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 		insert->alt = alt;
 		insert->next=NULL;
 		insert->adj = NULL;
+		insert->edges = 0;
+		insert->visited = 0;
+		insert->remove = 0;
+		insert->from = 0;
 		insert->next=front;
-		front=insert; // notice how the newest code is considered front now
+		//front=insert; // notice how the newest code is considered front now
 	// connect to list
 
-	return front;
+	return insert;
 }
 
 edge * insertEdge(edge *front, int id, double weight){
@@ -34,14 +52,17 @@ edge * insertEdge(edge *front, int id, double weight){
 		printf("Memory Error\n");
 		return NULL;
 	}
+	printf("!! ie: %d\n",id);
 	// insert data into new node
 	insert->id=id;
 	insert->weight = weight;
+	insert->remove = 0;
+	insert->visited = 0;
 	insert->next=NULL;
 
 	insert->next=front;
-	front=insert; // notice how the newest code is considered front now
-	return front;
+	//front=insert; // notice how the newest code is considered front now
+	return insert;
 }
 
 	
@@ -51,21 +72,24 @@ void destroy(vertex *front)
 
 	vertex *cursor;
 	cursor=front;
-	edge *edge;
+	edge *fuck;
+	edge *temp;
 
 	while(cursor!=NULL)
 	{
-		edge = cursor->adj;
-		while(edge)
+		fuck = cursor->adj;
+		while(fuck)
 		{
-			cursor->adj = cursor->adj->next;
-			free(edge);
-			edge = cursor->adj;
+			temp = fuck;
+			fuck= fuck->next;
+			printf("!! de: %d\n", temp->id);
+			free(temp);
 		}
 
-		front=front->next;
-		free(cursor);
-		cursor=front;
+		front=cursor;
+		cursor=front->next;
+		printf("!! dv: %d\n", front->id);
+		free(front);
 	}
 }
 
@@ -79,6 +103,7 @@ void printList(vertex *front)
 		printf("lat -> %lf\n", cursor->lat);
 		printf("lon -> %lf\n", cursor->lon);
 		printf("alt -> %f\n", cursor ->alt);
+		printf("edges ->%d\n", cursor->edges);
 		cursor = cursor->next;
 		puts(" ");
 	}
@@ -116,7 +141,7 @@ void printAdj(vertex *zergNode)
 {
 	vertex *cursor;
 	cursor = zergNode;
-	edge *edge;
+	edge *edge ;
 	while(cursor != NULL)
 	{	
 		edge = cursor->adj;
@@ -132,6 +157,78 @@ void printAdj(vertex *zergNode)
 		puts(" ");
 	}
 }
+
+int ListLength(vertex *front){
+	int count = 0;
+	vertex *cursor=front;
+	while(cursor!=NULL)
+	{
+		count++;
+		cursor=cursor->next;
+	}
+	return count;
+}
+
+int removeSingle(vertex *zergNode)
+{
+	vertex *cursor = zergNode;
+	int removals = 0;
+	while(cursor != NULL)
+	{
+		if(cursor->edges == 1)
+		{
+			cursor->remove = 1;
+			removals += 1;
+			adjAdjust(zergNode, cursor->adj->id, cursor->id);
+		}
+		cursor=cursor->next;
+	}
+	return removals;
+}
+
+void printRemovals(vertex *front)
+{
+	vertex *cursor;
+	cursor = front;
+	while(cursor != NULL)
+	{
+		if(cursor->remove == 1)
+		{
+			printf("Zerg %d has been removed\n", cursor->id);
+		}
+		cursor = cursor->next;
+		puts(" ");
+	}
+}
+
+void adjAdjust(vertex *zergNode, int adjId, int vertId )
+{
+	vertex *cursor;
+	edge *adjacencyIndex;
+	cursor = zergNode;
+	while(cursor != NULL)
+	{
+		if(cursor->id == adjId && cursor->edges>2)
+		{
+			cursor->edges--;
+			adjacencyIndex = cursor->adj;
+			while(adjacencyIndex!=NULL)
+			{
+				if(adjacencyIndex->id == vertId)
+				{
+					adjacencyIndex->remove += 1;
+				}
+				adjacencyIndex = adjacencyIndex->next;
+			}	
+			
+		}
+		cursor = cursor->next;
+	}
+}
+			
+	
+
+
 
 				
 					
