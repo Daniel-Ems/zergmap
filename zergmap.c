@@ -1,5 +1,21 @@
 
-#include "zergmap.h"
+#include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <arpa/inet.h>
+#define _GNU_SOURCE
+#include <sysexits.h>
+#include <sys/stat.h>
+#include <ctype.h>
+#include <math.h>
+
+#include "dijkstra.h"
+#include "healthTree.h"
+#include "zerg_list.h"
+#include "zergmap_functions.h"
+#include "zerg_functions.h"
 
 int
 main(int argc, char *argv[])
@@ -48,9 +64,12 @@ main(int argc, char *argv[])
     int fCheck;
 	uint32_t magicNumber = 0xa1b2c3d4;
 	vertex *zergNode = NULL;
+	healthTree *tree = NULL;
 
    while(argv[files] && files <= argc -1)
 	{
+	stat (argv[files], buffer);
+    fileEnd = buffer->st_size;
 	decodeFile = fopen(argv[files], "rb");
     if (!decodeFile)
    	{
@@ -199,7 +218,7 @@ main(int argc, char *argv[])
         switch (zerg_header)
         {
         case (1):
-            statFunction(zerged);
+            tree = statFunction(tree, zerged, zh->dest);
             break;
         case (3):
             zergNode = gpsFunction(zergNode, zerged, zh->dest);
@@ -215,12 +234,86 @@ main(int argc, char *argv[])
     fclose(decodeFile);
 	}
 
-	//printList(zergNode);
+	int numNode;
+	int maxRem;
+	int removals;
+
+	numNode = ListLength(zergNode);
+	maxRem = floor(numNode /2);
+	removals = removeSingle(zergNode);
+
+/*	
+//Still wonky, Handle Edge cases that
+	if(removals > maxRem)
+	{
+		printf("it is not possible\n");
+	}
+	else if(removals == 0)
+	{
+		printf("no zergs have been removed\n");
+	}
+	else
+	{
+		printRemovals(zergNode);
+	}
+	*/
+//	vertex *test;
+	//setCost(zergNode);
+	//test = zergNode;
+	//vertex *hope = setCost(zergNode);
+	//struct queue *node = malloc(sizeof(*node));
+	//node = qInit(node, numNode);
+
+	//while(test != NULL)
+	//{
+	//	if(test->edges == 2)
+	//	{
+	//		insert(node,test->id,0, 0);
+	//	}
+	//	test = test->next;
+	//}
+	//printf("queue size = %d\n", node->index+1);
+
+	//int start;
+	//int finish;
+	//int next;
+
+	//int twoWay = 2;
+	//bool failed = false;
+
+	//start = pop(node);
+	//finish = pop(node);
+	//vertex *findStart = findPlace(zergNode, start);
+	//vertex *dijkstra = zergNode;
+	/*
+
+	struct queue *priq = malloc(sizeof(*priq));
+	priq = qInit(priq, numNode);
 	
-	printAdj(zergNode);
+	printf("start = %d\n", start);
+	printf("finish = %d\n", finish);
+	printf("findStart id = %d\n", findStart->id);
 	
+ 	int total = 0;
+	
+	populate(priq, findStart, total);//updates priq
+
+	findStart = findPlace(zergNode, priq->next[0].id);//takes you to next cheap node
+
+	findStart->from = priq->next[0].from; //updates the  from in the node
+	
+	findStart->visited = 1; //sets node to visited
+
+	printList(zergNode);
+	*/
+	//printAdj(zergNode);
+	int lowHealth = 10;
+	print_tree(tree, lowHealth);
+
+	//obliviate(priq);
+	//obliviate(node);
+	destroy_healthTree(tree);
 	destroy(zergNode);
-	
     free(zh);
     free(udp);
     free(ip6);
