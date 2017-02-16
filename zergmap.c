@@ -64,7 +64,9 @@ main(int argc, char *argv[])
     int fCheck;
 	uint32_t magicNumber = 0xa1b2c3d4;
 	vertex *zergNode = NULL;
+	int zergFlag = 0;
 	healthTree *tree = NULL;
+	int treeFlag = 0;
 
    while(argv[files] && files <= argc -1)
 	{
@@ -306,14 +308,38 @@ main(int argc, char *argv[])
 
 	printList(zergNode);
 	*/
-	//printAdj(zergNode);
+	if(zergNode == NULL)
+	{
+		printf("no gps packets given\n");
+		zergFlag = 1;
+	}
+	else
+	{
+		printAdj(zergNode);
+	}
+	
+
 	int lowHealth = 10;
-	print_tree(tree, lowHealth);
+	if(tree == NULL)
+	{
+		printf("no status packets given\n");
+		treeFlag = 1;
+	}
+	else
+	{
+		print_tree(tree, lowHealth);
+	}
 
 	//obliviate(priq);
 	//obliviate(node);
-	destroy_healthTree(tree);
-	destroy(zergNode);
+	if(treeFlag == 0)
+	{
+		destroy_healthTree(tree);
+	}
+	if(zergFlag == 0)
+	{	
+		destroy(zergNode);
+	}
     free(zh);
     free(udp);
     free(ip6);
