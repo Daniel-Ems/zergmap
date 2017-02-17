@@ -37,8 +37,8 @@ statFunction(healthTree *tree, union PayloadStructs *zerg,  uint32_t zergId)
 
     zerg->stat.max_type = ntohl(zerg->stat.max_type) >> 8;
 
-  
-	double health = (zerg->stat.hit_armor/ zerg->stat.max_type)*100;
+	int health = ((double)zerg->stat.hit_armor/(double)zerg->stat.max_type)*100;
+
 	tree = insertTree(tree, zergId, health);
    
     free(zerg);
