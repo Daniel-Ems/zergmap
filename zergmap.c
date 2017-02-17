@@ -1,4 +1,6 @@
+#define _XOPEN_SOURCE
 
+#include <unistd.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -20,7 +22,7 @@
 int
 main(int argc, char *argv[])
 {
-
+	
     FILE *decodeFile;
 
 	  if (argc < 2)
@@ -29,22 +31,49 @@ main(int argc, char *argv[])
         return EX_USAGE;
     }
 
-	struct stat *buffer = malloc (sizeof (*buffer));
-	
-  	int i = 1;
-  	off_t fileEnd;
+	//fix tomorrow;
 
-	 for (i = 1; i < argc; i++)
+	int lowHealth;
+	
+	if(getopt(argc, argv, "h:") == 'h')
+	{
+		char *err;
+		if(!(lowHealth = strtol(optarg, &err, 10)))
+		{
+			lowHealth = 10;	
+		}
+		if(*err)
+		{
+			fprintf(stdout,"-h [numbers only]\n");
+			return EX_USAGE;
+		}
+	}
+	else 
+	{
+		lowHealth = 10;
+		optind ++;
+	}
+		
+	
+	struct stat *buffer = calloc (1,sizeof (*buffer));
+  	int i;
+  	off_t fileEnd = 0;
+
+	 for (i = optind; i < argc; i++)
     {
       stat (argv[i], buffer);
       fileEnd = buffer->st_size;
-      if (fileEnd == 0)
-	{
-	  printf ("Empty Files not allowed\n");
-	  goto cleanup1;
-	}
+      	if (fileEnd == 0)
+		{
+	  		printf ("Empty Files not allowed\n");
+	  		goto cleanup1;
+		}
     }
 
+	// Referncing movie_titler from class
+
+	
+	
 	struct FileHeader *fh = malloc(sizeof(*fh));
 	struct PcapHeader *ph = malloc(sizeof(*ph));
     struct EthernetFrame *eh = malloc(sizeof(*eh));
@@ -60,7 +89,7 @@ main(int argc, char *argv[])
     bool ipv4 = false; //if false means it is ipv6;
     size_t lengthCheck;
 
- 	int files = 1;
+ 	int files = optind;
     int fCheck;
 	uint32_t magicNumber = 0xa1b2c3d4;
 	vertex *zergNode = NULL;
@@ -244,21 +273,25 @@ main(int argc, char *argv[])
 	maxRem = floor(numNode /2);
 	removals = removeSingle(zergNode);
 
-/*	
+
 //Still wonky, Handle Edge cases that
 	if(removals > maxRem)
 	{
-		printf("it is not possible\n");
+		printf("IT IS NOT POSSIBLE\n");
+		
 	}
 	else if(removals == 0)
 	{
-		printf("no zergs have been removed\n");
+		printf("ALL ZERG ARE IN POSITION\n");
+		puts(" ");
 	}
 	else
 	{
+		printf("Network Alterations:\n");
 		printRemovals(zergNode);
+		puts(" ");
 	}
-	*/
+	
 //	vertex *test;
 	//setCost(zergNode);
 	//test = zergNode;
@@ -305,9 +338,9 @@ main(int argc, char *argv[])
 	findStart->from = priq->next[0].from; //updates the  from in the node
 	
 	findStart->visited = 1; //sets node to visited
-
-	printList(zergNode);
 	*/
+	//printList(zergNode);
+	/*
 	if(zergNode == NULL)
 	{
 		printf("no gps packets given\n");
@@ -317,9 +350,10 @@ main(int argc, char *argv[])
 	{
 		printAdj(zergNode);
 	}
-	
+	*/
 
-	int lowHealth = 10;
+
+	printf("Low Health (%d%%):\n", lowHealth);
 	if(tree == NULL)
 	{
 		printf("no status packets given\n");
