@@ -24,7 +24,7 @@ vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 			printf("Memory Error\n");
 			return NULL;
 		}
-		printf("!! iv: %d\n",id);
+
 		// insert data into new node
 		insert->id=id;
 		insert->lat=lat;
@@ -52,7 +52,7 @@ edge * insertEdge(edge *front, int id, double weight){
 		printf("Memory Error\n");
 		return NULL;
 	}
-	printf("!! ie: %d\n",id);
+
 	// insert data into new node
 	insert->id=id;
 	insert->weight = weight;
@@ -82,13 +82,13 @@ void destroy(vertex *front)
 		{
 			temp = fuck;
 			fuck= fuck->next;
-			printf("!! de: %d\n", temp->id);
+
 			free(temp);
 		}
 
 		front=cursor;
 		cursor=front->next;
-		printf("!! dv: %d\n", front->id);
+
 		free(front);
 	}
 }
@@ -194,10 +194,10 @@ void printRemovals(vertex *front)
 	{
 		if(cursor->remove == 1)
 		{
-			printf("Zerg %d has been removed\n", cursor->id);
+			printf("Remove Zerg #%d\n", cursor->id);
 		}
 		cursor = cursor->next;
-		puts(" ");
+		
 	}
 }
 
