@@ -31,8 +31,6 @@ main(int argc, char *argv[])
         return EX_USAGE;
     }
 
-	//fix tomorrow;
-
 	int lowHealth;
 	
 	if(getopt(argc, argv, "h:") == 'h')
@@ -58,6 +56,8 @@ main(int argc, char *argv[])
   	int i;
   	off_t fileEnd = 0;
 
+	//This loop will check to see if any of the files passed on the command
+	//line are bad files
 	 for (i = optind; i < argc; i++)
     {
       stat (argv[i], buffer);
@@ -279,6 +279,9 @@ main(int argc, char *argv[])
 	bool goodGraph = true;;
 	vertex *place = zergNode;
 	numNode = ListLength(zergNode);
+	
+	int graphFlag = 0;	
+
 	if(numNode == 0)
 	{
 		goodGraph = false;
@@ -293,11 +296,11 @@ main(int argc, char *argv[])
 		maxRem = floor(numNode /2);
 		removals = removeSingle(zergNode);
 	
-	
 		// If the # of removals exceeds the maximum number of allowed removals.
 		// Then there is a straight line of connections.
 		if(removals > maxRem)
 		{	
+			graphFlag = 1;
 			if(numNode == 3)
 			{
 				printf("Remove Zerg #%d\n", zergNode->id);
@@ -312,8 +315,12 @@ main(int argc, char *argv[])
 				printf("IT IS NOT POSSIBLE\n");
 				//printf("Total Removals %d\n",removals);
 			}
+			
 		}
-	
+	}
+
+	if(graphFlag == 0)
+	{
 		goodGraph = sameConnections(zergNode);
 		if(goodGraph)
 		{
@@ -327,9 +334,9 @@ main(int argc, char *argv[])
 		{
 			printf("UNKOWN SOLUTION\n");
 		}
-			
-		
 	}
+		
+	
 
 	printf("Low Health (%d%%):\n", lowHealth);
 	if(tree == NULL)
