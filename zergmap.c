@@ -272,11 +272,11 @@ main(int argc, char *argv[])
     fclose(decodeFile);
 	}
 	
+	int byebye;
 	int numNode;
 	int maxRem;
 	int removals;
 	bool goodGraph = true;;
-	int finishFlag = 0;
 	vertex *place = zergNode;
 	numNode = ListLength(zergNode);
 	if(numNode == 0)
@@ -298,7 +298,6 @@ main(int argc, char *argv[])
 		// Then there is a straight line of connections.
 		if(removals > maxRem)
 		{	
-			finishFlag = 1;
 			if(numNode == 3)
 			{
 				printf("Remove Zerg #%d\n", zergNode->id);
@@ -314,16 +313,24 @@ main(int argc, char *argv[])
 				//printf("Total Removals %d\n",removals);
 			}
 		}
-		if(finishFlag == 0)
+	
+		goodGraph = sameConnections(zergNode);
+		if(goodGraph)
 		{
-			goodGraph = sameConnections(zergNode);
-			if(goodGraph)
+			byebye = printRemovals(zergNode);
+			if(byebye == 0)
 			{
-				printRemovals(zergNode);
+				printf("ALL ZERG ARE IN POSITION\n");
 			}
-			
 		}
+		else
+		{
+			printf("UNKOWN SOLUTION\n");
+		}
+			
+		
 	}
+
 	printf("Low Health (%d%%):\n", lowHealth);
 	if(tree == NULL)
 	{
