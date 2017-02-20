@@ -25,6 +25,7 @@ typedef struct healthTree
 
 } healthTree;
 
+enum{ MAX_HEALTH = 100};
 healthTree *insertTree(healthTree *tree, int id, double health);
 void print_tree (healthTree *tree, int lowHealth);
 void destroy_healthTree (healthTree * tree);
