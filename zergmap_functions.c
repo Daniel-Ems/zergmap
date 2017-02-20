@@ -18,156 +18,157 @@
 
 
 union PayloadStructs *
-struct_init(int total, FILE * decodeFile, int type)
+struct_init (int total, FILE * decodeFile, int type)
 {
-    int fCheck;
-    union PayloadStructs *memory = calloc(1, sizeof(*memory) );
-    if (!memory)
+  int fCheck;
+  union PayloadStructs *memory = calloc (1, sizeof (*memory));
+  if (!memory)
     {
-        printf("NO MALLOC");
-		return memory;
+      printf ("NO MALLOC");
+      return memory;
     }
-	if(type == 0)
-	{
-		memory->mess.message = calloc(1, (total - zerg_header_length) +1);
+  if (type == 0)
+    {
+      memory->mess.message = calloc (1, (total - zerg_header_length) + 1);
 
-		fCheck = fread(memory->mess.message, (total - zerg_header_length), 1
-						, decodeFile);
-	}
-	else
-	{
-   		 fCheck = fread(memory, total - zerg_header_length, 1, decodeFile);
-	}
-    if (fCheck != 1)
-    {
-        memory = NULL;
+      fCheck =
+	fread (memory->mess.message, (total - zerg_header_length), 1,
+	       decodeFile);
     }
-    return memory;
+  else
+    {
+      fCheck = fread (memory, total - zerg_header_length, 1, decodeFile);
+    }
+  if (fCheck != 1)
+    {
+      memory = NULL;
+    }
+  return memory;
 }
 
 //Conceptually Explained by Dow
 float
-converter(uint32_t * thing)
+converter (uint32_t * thing)
 {
-    union converter
-    {
-        float speed;
-        uint32_t test;
-    };
-    union converter speed_test;
+  union converter
+  {
+    float speed;
+    uint32_t test;
+  };
+  union converter speed_test;
 
-    speed_test.test = ntohl(*thing);
-    float speedy = speed_test.speed;
+  speed_test.test = ntohl (*thing);
+  float speedy = speed_test.speed;
 
-    return speedy;
+  return speedy;
 }
 
 void
-print_zerg_header(struct ZergHeader *zerg)
+print_zerg_header (struct ZergHeader *zerg)
 {
 
-    zerg->version = (zerg->version & 0x10) >> 4;
+  zerg->version = (zerg->version & 0x10) >> 4;
 
-    printf("Version : %d\n", zerg->version);
-    printf("Sequence: %d\n", ntohl(zerg->id));
-    printf("From    : %d\n", ntohs(zerg->source));
-    printf("To      : %d\n", ntohs(zerg->dest));
+  printf ("Version : %d\n", zerg->version);
+  printf ("Sequence: %d\n", ntohl (zerg->id));
+  printf ("From    : %d\n", ntohs (zerg->source));
+  printf ("To      : %d\n", ntohs (zerg->dest));
 }
 
 
 //compliments of DOW 
 uint64_t
-doub_flip(uint32_t * most, uint32_t * least)
+doub_flip (uint32_t * most, uint32_t * least)
 {
 
-    uint64_t flipped_double;
+  uint64_t flipped_double;
 
-    *most = ntohl(*most);
-    *least = ntohl(*least);
+  *most = ntohl (*most);
+  *least = ntohl (*least);
 
-    flipped_double = *most;
-    flipped_double = flipped_double << 32;
-    flipped_double = flipped_double + *least;
+  flipped_double = *most;
+  flipped_double = flipped_double << 32;
+  flipped_double = flipped_double + *least;
 
-    return flipped_double;
+  return flipped_double;
 }
 
 //Conceptually explained by Dow
 double
-doub_converter(uint64_t * number)
+doub_converter (uint64_t * number)
 {
-    union doub_converter
-    {
-        double place_holder;
-        uint64_t old_number;
-    };
-    union doub_converter conversion;
+  union doub_converter
+  {
+    double place_holder;
+    uint64_t old_number;
+  };
+  union doub_converter conversion;
 
-    conversion.old_number = *number;
-    double new_number = conversion.place_holder;
+  conversion.old_number = *number;
+  double new_number = conversion.place_holder;
 
-    return new_number;
+  return new_number;
 }
 
 const char *
-raceId(uint32_t type)
+raceId (uint32_t type)
 {
-    const char *raceId = "No type";
+  const char *raceId = "No type";
 
-    switch (type)
+  switch (type)
     {
     case (0):
-        raceId = "Overmind";
-        break;
+      raceId = "Overmind";
+      break;
     case (1):
-        raceId = "Larva";
-        break;
+      raceId = "Larva";
+      break;
     case (2):
-        raceId = "Cerebrate";
-        break;
+      raceId = "Cerebrate";
+      break;
     case (3):
-        raceId = "Overlord";
-        break;
+      raceId = "Overlord";
+      break;
     case (4):
-        raceId = "Queen";
-        break;
+      raceId = "Queen";
+      break;
     case (5):
-        raceId = "Drone";
-        break;
+      raceId = "Drone";
+      break;
     case (6):
-        raceId = "Zergling";
-        break;
+      raceId = "Zergling";
+      break;
     case (7):
-        raceId = "Lurker";
-        break;
+      raceId = "Lurker";
+      break;
     case (8):
-        raceId = "Brooding";
-        break;
+      raceId = "Brooding";
+      break;
     case (9):
-        raceId = "Hydralisk";
-        break;
+      raceId = "Hydralisk";
+      break;
     case (10):
-        raceId = "Guardian";
-        break;
+      raceId = "Guardian";
+      break;
     case (11):
-        raceId = "Scourge";
-        break;
+      raceId = "Scourge";
+      break;
     case (12):
-        raceId = "Ultralisk";
-        break;
+      raceId = "Ultralisk";
+      break;
     case (13):
-        raceId = "Mutalisk";
-        break;
+      raceId = "Mutalisk";
+      break;
     case (14):
-        raceId = "Defiler";
-        break;
+      raceId = "Defiler";
+      break;
     case (15):
-        raceId = "Devourer";
-        break;
+      raceId = "Devourer";
+      break;
     default:
-        return raceId;
-        break;
+      return raceId;
+      break;
 
     }
-    return raceId;
+  return raceId;
 }

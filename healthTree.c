@@ -2,7 +2,7 @@
 
 
 healthTree *
-insertTree (healthTree* tree, int id, double health)
+insertTree (healthTree * tree, int id, double health)
 {
 
   //If tree == NULL, a new node is created.
@@ -19,14 +19,14 @@ insertTree (healthTree* tree, int id, double health)
 	{
 	  //callocs for the size of the string. The string is then strncpy'd
 	  tree->id = id;
-	  tree->health  = health;
+	  tree->health = health;
 	  tree->left = tree->right = NULL;
 	}
     }
 
   else
     {
-     
+
       if (id < tree->id)
 	{
 	  tree->left = insertTree (tree->left, id, health);
@@ -51,21 +51,21 @@ destroy_healthTree (healthTree * tree)
     {
       return;
     }
- 
+
   destroy_healthTree (tree->left);
   destroy_healthTree (tree->right);
   free (tree);
 }
 
 void
-print_tree (healthTree *tree, int lowHealth)
+print_tree (healthTree * tree, int lowHealth)
 {
   //The function will move to the bottom left. 
   if (tree->left)
     {
       print_tree (tree->left, lowHealth);
     }
- 
+
   if (tree->health <= lowHealth)
     {
       printf ("Zerg #%d\n", tree->id);
@@ -73,8 +73,7 @@ print_tree (healthTree *tree, int lowHealth)
 
   if (tree->right)
     {
-      print_tree (tree->right,  lowHealth);
+      print_tree (tree->right, lowHealth);
     }
 
 }
-
