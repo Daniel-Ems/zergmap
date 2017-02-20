@@ -141,7 +141,7 @@ double pythagorean(float alt1, float alt2, double haversine)
 	return sqrt(cSqr);
 }
 
-//Debugging function used to  print the contents of adjacency nodes. 
+//Debugging function used to  print the contents of adjacency nodes.
 void printAdj(vertex *zergNode)
 {
 	vertex *cursor;
@@ -223,8 +223,9 @@ bool sameConnections(vertex *zergNode)
 	return goodGraph;
 }
 	
-void printRemovals(vertex *front)
+int printRemovals(vertex *front)
 {
+	int removals = 0;
 	vertex *cursor;
 	cursor = front;
 	while(cursor != NULL)
@@ -232,10 +233,12 @@ void printRemovals(vertex *front)
 		if(cursor->remove == 1)
 		{
 			printf("Remove Zerg #%d\n", cursor->id);
+			removals ++;
 		}
 		cursor = cursor->next;
 		
 	}
+	return removals;
 }
 
 void adjAdjust(vertex *zergNode, int adjId)
