@@ -13,7 +13,6 @@
 #include "zerg_list.h"
 
 
-
 //All of these functions were taken from the Linked List section of DSAI
 vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 
@@ -32,6 +31,7 @@ vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 		insert->alt = alt;
 		insert->next=NULL;
 		insert->adj = NULL;
+		insert->total = 0;
 		insert->edges = 0;
 		insert->visited = 0;
 		insert->remove = 0;
@@ -43,7 +43,7 @@ vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt){
 	return insert;
 }
 
-edge * insertEdge(edge *front, int id, double weight){
+edge * insertEdge(edge *front, int id, double weight, vertex *parent){
 
 	// create new node
 	edge *insert=(edge *)malloc(sizeof(edge));
@@ -58,7 +58,10 @@ edge * insertEdge(edge *front, int id, double weight){
 	insert->weight = weight;
 	insert->remove = 0;
 	insert->visited = 0;
+	insert->total = 0;
+	insert->from = 0;
 	insert->next=NULL;
+	insert->parent = parent;
 
 	insert->next=front;
 	//front=insert; // notice how the newest code is considered front now
@@ -74,10 +77,12 @@ void destroy(vertex *front)
 	cursor=front;
 	edge *fuck;
 	edge *temp;
+	
 
 	while(cursor!=NULL)
 	{
 		fuck = cursor->adj;
+
 		while(fuck)
 		{
 			temp = fuck;
@@ -136,7 +141,6 @@ double pythagorean(float alt1, float alt2, double haversine)
 }
 
 
-
 void printAdj(vertex *zergNode)
 {
 	vertex *cursor;
@@ -146,10 +150,12 @@ void printAdj(vertex *zergNode)
 	{	
 		edge = cursor->adj;
 		printf("cursor id-> %d\n", cursor->id);
+		printf("cursor edges->%d\n", cursor->edges);
 		while(edge !=NULL)
 		{
 			printf("adj id -> %d\n", edge->id);
-			printf("adj haves ->%lf\n", edge->weight);
+			printf("adj haves ->%d\n", (int)edge->weight);
+			printf("adj->parent->edges->%d\n", edge->parent->edges);
 			edge = edge -> next;
 		}
 		cursor = cursor->next;
@@ -173,19 +179,49 @@ int removeSingle(vertex *zergNode)
 {
 	vertex *cursor = zergNode;
 	int removals = 0;
-	while(cursor != NULL)
+	if(cursor == NULL)
 	{
-		if(cursor->edges == 1)
-		{
-			cursor->remove = 1;
-			removals += 1;
-			adjAdjust(zergNode, cursor->adj->id, cursor->id);
-		}
-		cursor=cursor->next;
+		return removals;
+	}
+	removals += removeSingle(cursor->next);
+	if(cursor->edges == 1)
+	{
+		cursor->remove = 1;
+		adjAdjust(cursor->adj->parent, cursor->id);
+		removals++;
+	}
+	if(cursor->edges == 0)
+	{
+		cursor->remove = 1;
+		removals++;
 	}
 	return removals;
+
 }
 
+bool sameConnections(vertex *zergNode)
+{
+	bool goodGraph = true;
+	vertex *cursor = zergNode;
+	int graphConn;
+	while(cursor->remove != 0)
+	{
+		cursor = cursor->next;
+	}
+	graphConn = cursor->edges;
+	cursor = zergNode;
+	while(cursor)
+	{
+		if(cursor->edges != graphConn && cursor->remove == 0)
+		{
+			goodGraph = false;
+			return goodGraph;
+		}
+		cursor = cursor->next;
+	}
+	return goodGraph;
+}
+	
 void printRemovals(vertex *front)
 {
 	vertex *cursor;
@@ -201,32 +237,53 @@ void printRemovals(vertex *front)
 	}
 }
 
-void adjAdjust(vertex *zergNode, int adjId, int vertId )
+void adjAdjust(vertex *zergNode, int adjId)
 {
 	vertex *cursor;
 	edge *adjacencyIndex;
+
 	cursor = zergNode;
-	while(cursor != NULL)
+	adjacencyIndex = cursor->adj;
+	cursor->edges--;
+
+	while(adjacencyIndex)
 	{
-		if(cursor->id == adjId && cursor->edges>2)
+		if(adjacencyIndex->id == adjId)
 		{
-			cursor->edges--;
-			adjacencyIndex = cursor->adj;
-			while(adjacencyIndex!=NULL)
-			{
-				if(adjacencyIndex->id == vertId)
-				{
-					adjacencyIndex->remove += 1;
-				}
-				adjacencyIndex = adjacencyIndex->next;
-			}	
-			
+			adjacencyIndex->remove += 1;
+			return;
 		}
-		cursor = cursor->next;
+		adjacencyIndex = adjacencyIndex->next;
+	}	
+}
+
+//This function sets the cost to the greates number of adjancies present between
+//two adjacent nodes.
+void gainWeight(vertex *zergNode)
+{
+	vertex *placeHolder = zergNode;	
+	edge *temp;
+	
+	while(placeHolder)
+	{
+		temp = placeHolder->adj;
+		while(temp)
+		{
+			//setting haves to edge weight in order to force some form of path
+			//during dijkstra's
+			if(placeHolder->edges < temp->parent->edges)
+			{
+				temp->weight = temp->parent->edges;
+			}
+			else
+			{
+				temp->weight = placeHolder->edges;
+			}
+			temp = temp->next;
+		}
+	placeHolder = placeHolder->next;
 	}
 }
-			
-	
 
 
 

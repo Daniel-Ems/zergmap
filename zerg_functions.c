@@ -128,9 +128,9 @@ gpsFunction(vertex *zergNode, union PayloadStructs *zerg, uint32_t zergId)
 		}
 		if(haves < 15)
 		{
-			cursor->adj = insertEdge(cursor->adj, id, haves);
+			cursor->adj = insertEdge(cursor->adj, id, haves, zergNode);
 			cursor->edges+= 1;
-			zergNode->adj = insertEdge(zergNode->adj, cursor->id, haves);
+			zergNode->adj = insertEdge(zergNode->adj, cursor->id, haves, cursor);
 			zergNode->edges+=1;
 		}
 		cursor = cursor -> next;
