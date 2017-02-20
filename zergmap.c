@@ -277,7 +277,7 @@ main(int argc, char *argv[])
 	int removals;
 	bool goodGraph = true;;
 	int finishFlag = 0;
-	
+	vertex *place = zergNode;
 	numNode = ListLength(zergNode);
 	if(numNode == 0)
 	{
@@ -285,16 +285,14 @@ main(int argc, char *argv[])
 	}
 	if(goodGraph)
 	{
+		while(place)
+		{
+			tree = insertTree(tree, place->id, MAX_HEALTH);
+			place = place->next;
+		}
 		maxRem = floor(numNode /2);
 		removals = removeSingle(zergNode);
 	
-		struct queue *node = malloc(sizeof(*node));
-		node = qInit(node, numNode);
-
-		
-		int listLen = ListLength(zergNode);
-		int *array = calloc(sizeof(*array), listLen);
-		int position = 0;
 	
 		// If the # of removals exceeds the maximum number of allowed removals.
 		// Then there is a straight line of connections.
@@ -316,7 +314,6 @@ main(int argc, char *argv[])
 				//printf("Total Removals %d\n",removals);
 			}
 		}
-	
 		if(finishFlag == 0)
 		{
 			goodGraph = sameConnections(zergNode);
@@ -324,98 +321,9 @@ main(int argc, char *argv[])
 			{
 				printRemovals(zergNode);
 			}
-			else
-			{
-		
-			gainWeight(zergNode);
-			vertex *test;
-			test = zergNode;
-
-			while(test)
-			{
-				if(test->edges == 2)
-				{
-					array[position] = test->id;
-					printf("position %d = id %d\n", position, test->id);
-					position++;
-				}
-				test = test->next;
-			}
-	
-			test = zergNode;
-
-			test = findPlace(test, array[0]);
-
-			printf("test->id %d\n", test->id);
-
-			puts(" ");
-	
-			edge *currEdge = test->adj;
-		
-			test->visited = 1;
-			test->total = 0;
-			int finish = 1;
-			int start = test->id;
-			//path *second;
-			//int startPos = 0;
-			//for(startPos = 0; start< position -1; start ++)
-
-			while(finish <= 2)
-			{
-				while( test->id != array[2])
-				{ 
-					currEdge=test->adj;
-					while(currEdge)
-					{
-						if(currEdge->parent->visited == 1 
-							|| currEdge->parent->remove == 1)
-						{
-							currEdge=currEdge->next;
-						}
-						else
-						{
-	
-							insert(node, currEdge, test->id, test->total);
-							currEdge = currEdge->next;
-						}
-					}
-					if(node->next[0])
-					{
-						currEdge = pop(node);
-						printf("node Popped %d, from %d\n", currEdge->id, currEdge->from);
-						currEdge->parent->visited = 1;
-						currEdge->parent->total = currEdge->total;
-						currEdge->parent->from = currEdge->from;
-						test = currEdge->parent;
-					}
-					
-				}
-				test->total = 0;
-	
-				while(test->id != start)
-				{
-					test = findPlace(zergNode, test->from);
-					test->remove = 1;
-				}
-				test = zergNode;
-				while(test)
-				{
-					test->visited = 0;
-					test->total = 0;
-					test = test->next;
-				}
-				test = findPlace(zergNode, start);
-				
-								
-				puts(" ");
-				finish++;
-			}
-			printf("I found two paths\n");
-			}
+			
 		}
-		free(array);
-		obliviate(node);
-		}
+	}
 	printf("Low Health (%d%%):\n", lowHealth);
 	if(tree == NULL)
 	{
@@ -425,8 +333,6 @@ main(int argc, char *argv[])
 	{
 		print_tree(tree, lowHealth);
 	}
-
-	//annihilate(pathTraveled);
 	
 	if(treeFlag == 0)
 	{
