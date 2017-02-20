@@ -33,7 +33,7 @@ void adjAdjust(vertex *zergNode, int adjId);
 int removeSingle(vertex *zergNode);
 bool sameConnections(vertex *zergNode);
 int goodStrings(vertex *zergNode, int numNode);
-void printRemovals(vertex *front);
+int printRemovals(vertex *front);
 int ListLength(vertex *front);
 vertex *insertVertex(vertex *front, int id, double lon, double lat, float alt);
 edge * insertEdge(edge *front, int id, double weight, vertex *parent);
