@@ -61,13 +61,22 @@ main(int argc, char *argv[])
 	 for (i = optind; i < argc; i++)
     {
       stat (argv[i], buffer);
+	if(buffer)	
+	{
       fileEnd = buffer->st_size;
+	
       	if (fileEnd == 0)
 		{
 	  		printf ("Empty Files not allowed\n");
 	  		goto cleanup1;
 		}
+	}
+	else
+	{
+		printf("bad file\n");
+		goto cleanup1;
     }
+	}
 
 	struct FileHeader *fh = calloc(1,sizeof(*fh));
 	struct PcapHeader *ph = calloc(1,sizeof(*ph));
@@ -95,12 +104,15 @@ main(int argc, char *argv[])
    while(argv[files] && files <= argc -1)
 	{
 	stat (argv[files], buffer);
-    fileEnd = buffer->st_size;
+	if(buffer)
+	{
+    	fileEnd = buffer->st_size;
+	}
 	decodeFile = fopen(argv[files], "rb");
     if (!decodeFile)
    	{
 	  files++;
-	  continue;
+	 
     }
 
     fCheck = fread(fh, sizeof(*fh), 1, decodeFile);
@@ -263,154 +275,151 @@ main(int argc, char *argv[])
 	int numNode;
 	int maxRem;
 	int removals;
-	bool goodGraph;
+	bool goodGraph = true;;
 	int finishFlag = 0;
 	
 	numNode = ListLength(zergNode);
-	maxRem = floor(numNode /2);
-	removals = removeSingle(zergNode);
-	
-	struct queue *node = malloc(sizeof(*node));
-	node = qInit(node, numNode);
-
-		
-	int listLen = ListLength(zergNode);
-	int *array = calloc(sizeof(*array), listLen);
-	int position = 0;
-	
-	// If the # of removals exceeds the maximum number of allowed removals.
-	// Then there is a straight line of connections.
-	if(removals > maxRem)
+	if(numNode == 0)
 	{
-		finishFlag = 1;
-		if(numNode == 3)
-		{
-			printf("Remove Zerg #%d\n", zergNode->id);
-		}
-		else if(numNode == 4)
-		{
-			printf("Remove Zerg #%d\n", zergNode->id);
-			printf("Remove Zerg #%d\n", zergNode->next->id);
-		}
-		else
-		{
-			printf("IT IS NOT POSSIBLE\n");
-			//printf("Total Removals %d\n",removals);
-		}
+		goodGraph = false;
 	}
-	
-	if(finishFlag == 0)
+	if(goodGraph)
 	{
-		goodGraph = sameConnections(zergNode);
-		if(goodGraph)
-		{
-			printRemovals(zergNode);
-		}
-		else
-		{
+		maxRem = floor(numNode /2);
+		removals = removeSingle(zergNode);
 	
-		gainWeight(zergNode);
-		vertex *test;
-		test = zergNode;
+		struct queue *node = malloc(sizeof(*node));
+		node = qInit(node, numNode);
 
-		while(test)
-		{
-			if(test->edges == 2)
-			{
-				array[position] = test->id;
-				printf("position %d = id %d\n", position, test->id);
-				position++;
-			}
-			test = test->next;
-		}
-
-		test = zergNode;
-
-		test = findPlace(test, array[0]);
-
-		printf("test->id %d\n", test->id);
-
-		puts(" ");
-	
-		edge *currEdge = test->adj;
 		
-		test->visited = 1;
-		test->total = 0;
-		int finish = 1;
-		int start = test->id;
-		//path *second;
-		//int startPos = 0;
-		//for(startPos = 0; start< position -1; start ++)
-
-		while(finish <= 2)
-		{
-			while( test->id != array[2])
-			{ 
-				currEdge=test->adj;
-				while(currEdge)
-				{
-					if(currEdge->parent->visited == 1 
-						|| currEdge->parent->remove == 1)
-					{
-						currEdge=currEdge->next;
-					}
-					else
-					{
-
-						insert(node, currEdge, test->id, test->total);
-						currEdge = currEdge->next;
-					}
-				}
-				if(node->next[0])
-				{
-					currEdge = pop(node);
-					printf("node Popped %d, from %d\n", currEdge->id, currEdge->from);
-					currEdge->parent->visited = 1;
-					currEdge->parent->total = currEdge->total;
-					currEdge->parent->from = currEdge->from;
-					test = currEdge->parent;
-				}
-				
-			}
-			test->total = 0;
-
-			while(test->id != start)
+		int listLen = ListLength(zergNode);
+		int *array = calloc(sizeof(*array), listLen);
+		int position = 0;
+	
+		// If the # of removals exceeds the maximum number of allowed removals.
+		// Then there is a straight line of connections.
+		if(removals > maxRem)
+		{	
+			finishFlag = 1;
+			if(numNode == 3)
 			{
-				test = findPlace(zergNode, test->from);
-				test->remove = 1;
+				printf("Remove Zerg #%d\n", zergNode->id);
 			}
+			else if(numNode == 4)
+			{
+				printf("Remove Zerg #%d\n", zergNode->id);
+				printf("Remove Zerg #%d\n", zergNode->next->id);
+			}
+			else
+			{
+				printf("IT IS NOT POSSIBLE\n");
+				//printf("Total Removals %d\n",removals);
+			}
+		}
+	
+		if(finishFlag == 0)
+		{
+			goodGraph = sameConnections(zergNode);
+			if(goodGraph)
+			{
+				printRemovals(zergNode);
+			}
+			else
+			{
+		
+			gainWeight(zergNode);
+			vertex *test;
 			test = zergNode;
+
 			while(test)
 			{
-				test->visited = 0;
-				test->total = 0;
+				if(test->edges == 2)
+				{
+					array[position] = test->id;
+					printf("position %d = id %d\n", position, test->id);
+					position++;
+				}
 				test = test->next;
 			}
-			test = findPlace(zergNode, start);
-			
-							
+	
+			test = zergNode;
+
+			test = findPlace(test, array[0]);
+
+			printf("test->id %d\n", test->id);
+
 			puts(" ");
-			finish++;
+	
+			edge *currEdge = test->adj;
+		
+			test->visited = 1;
+			test->total = 0;
+			int finish = 1;
+			int start = test->id;
+			//path *second;
+			//int startPos = 0;
+			//for(startPos = 0; start< position -1; start ++)
+
+			while(finish <= 2)
+			{
+				while( test->id != array[2])
+				{ 
+					currEdge=test->adj;
+					while(currEdge)
+					{
+						if(currEdge->parent->visited == 1 
+							|| currEdge->parent->remove == 1)
+						{
+							currEdge=currEdge->next;
+						}
+						else
+						{
+	
+							insert(node, currEdge, test->id, test->total);
+							currEdge = currEdge->next;
+						}
+					}
+					if(node->next[0])
+					{
+						currEdge = pop(node);
+						printf("node Popped %d, from %d\n", currEdge->id, currEdge->from);
+						currEdge->parent->visited = 1;
+						currEdge->parent->total = currEdge->total;
+						currEdge->parent->from = currEdge->from;
+						test = currEdge->parent;
+					}
+					
+				}
+				test->total = 0;
+	
+				while(test->id != start)
+				{
+					test = findPlace(zergNode, test->from);
+					test->remove = 1;
+				}
+				test = zergNode;
+				while(test)
+				{
+					test->visited = 0;
+					test->total = 0;
+					test = test->next;
+				}
+				test = findPlace(zergNode, start);
+				
+								
+				puts(" ");
+				finish++;
+			}
+			printf("I found two paths\n");
+			}
 		}
-		printf("I found two paths\n");
+		free(array);
+		obliviate(node);
 		}
-	}
-/*
-		if(zergNode == NULL)
-		{
-		printf("no gps packets given\n");
-		zergFlag = 1;
-		}
-		else
-		{
-		printAdj(zergNode);
-		}
-*/
 	printf("Low Health (%d%%):\n", lowHealth);
 	if(tree == NULL)
 	{
-		printf("no status packets given\n");
-		treeFlag = 1;
+	treeFlag = 1;
 	}
 	else
 	{
@@ -427,8 +436,7 @@ main(int argc, char *argv[])
 	{	
 		destroy(zergNode);
 	}
-	free(array);
-	obliviate(node);
+	
     free(zh);
     free(udp);
     free(ip6);
