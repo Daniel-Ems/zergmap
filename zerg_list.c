@@ -205,9 +205,16 @@ bool sameConnections(vertex *zergNode)
 	bool goodGraph = true;
 	vertex *cursor = zergNode;
 	int graphConn;
-	while(cursor->remove != 0)
+	while(cursor)
 	{
-		cursor = cursor->next;
+		if(cursor->remove == 1)
+		{
+			cursor = cursor->next;
+		}
+		else
+		{
+			break;
+		}
 	}
 	graphConn = cursor->edges;
 	cursor = zergNode;
