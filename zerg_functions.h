@@ -9,7 +9,8 @@
 
 extern union PayloadStructs *zerg;
 void messFunction(union PayloadStructs *zerg);
-healthTree* statFunction(healthTree *tree, union PayloadStructs *zerg, uint32_t zergId);
+healthTree* statFunction(healthTree *tree, union PayloadStructs *zerg, 
+						uint32_t zergId);
 void commFunction(union PayloadStructs *zerg);
 struct vertex* gpsFunction(struct vertex *zergNode, 
 					union PayloadStructs *zerg, uint32_t id);

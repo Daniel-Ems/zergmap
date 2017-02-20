@@ -98,6 +98,7 @@ void destroy(vertex *front)
 	}
 }
 
+// debugging function for printing the contents of zergNodes
 void printList(vertex *front)
 {
 	vertex *cursor;
@@ -140,7 +141,7 @@ double pythagorean(float alt1, float alt2, double haversine)
 	return sqrt(cSqr);
 }
 
-
+//Debugging function used to  print the contents of adjacency nodes. 
 void printAdj(vertex *zergNode)
 {
 	vertex *cursor;
